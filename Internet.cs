@@ -110,6 +110,7 @@ public class WebPage
     {
         Name = name;
         Server = host;
+        E = new List<WebPage>(); // Initializing a list of webpages for the hyperlinks on the webpage
     }
 
     public int FindLink(string name)
@@ -126,21 +127,39 @@ public class WebGraph
     // Create an empty WebGraph
     public WebGraph()
     {
-
+        P = new List<WebPage>(); // Initializing the web graph to have an empty list for webpages
     }
 
     // Return the index of the webpage with the given name; otherwise return -1
     private int FindPage(string name)
     {
-        return -1;
+        int i;
+
+        for (i = 0; i < P.Count; i++)
+        {
+            if (P[i].Name.Equals(name))
+                return i;
+        }
+        return -1;      
+        
     }
 
     // Add a webpage with the given name and store it on the host server
     // Return true if successful; otherwise return false
-
+    //WORK IN PROGRESS - Camryn
     public bool AddPage (string name, string host)
     {
-        return false;
+        // Check if host exists
+
+        // If the page does not exist yet, add it
+        if (FindPage(name) == -1)
+        {
+            WebPage p = new WebPage(name, host);
+            P.Add(p); // Will change this to adding to the server
+             return true; // Return true if the webpage was successfully added
+        }
+
+        return false; // Return false if the webpage was not added
     }
 
     // Remove the webpage with the given name, including the hyperlinks
@@ -156,7 +175,19 @@ public class WebGraph
     // Return true if successful; otherwise return false
     public bool AddLink(string from, string to)
     {
-        return false;
+            // Checking that both of the pages exist
+            // If they dont, return false
+            if ((FindPage(from) == -1) || (FindPage(to) == -1))
+                return false;
+
+            // Checking that the webpage doesn't already have a hyperlink to the webpage
+            // If it does, return false
+            if (P[FindPage(from)].FindLink(to) != -1)
+                return false;
+
+            P[FindPage(from)].E.Add(P[FindPage(to)]);
+
+            return true;
     }
 
     // Remove a hyperlink from one webpage to another
@@ -177,7 +208,18 @@ public class WebGraph
     // Print the name and hyperlinks of each webpage
     public void PrintGraph()
     {
-
+        //Printing the name of each webpage
+        for (int i = 0; i < P.Count; i++)
+        {
+            Console.WriteLine(P[i].Name);
+                
+            //Printing out each hyperlink associated with the webpage
+            for (int j = 0; j < P[i].E.Count; j++)
+            {
+                Console.WriteLine("    Hyperlink to: "+P[i].E[j].Name);
+            }
+        }
+        Console.ReadLine();  
     }
 
 }
