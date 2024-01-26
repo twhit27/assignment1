@@ -61,6 +61,15 @@
         return false;
     }
 
+     // 3 marks (Bonus)
+    // Remove the webpage from the server with the given name
+    // Return true if successful; otherwise return false
+    public bool RemoveWebPage(string webpage, string name)
+    {
+        //code...
+        return false;
+    }
+
     // Add a connection from one server to another
     // Return true if successful; otherwise return false
     // Note that each server is connected to at least one other server
@@ -147,7 +156,7 @@ public class WebGraph
     // Add a webpage with the given name and store it on the host server
     // Return true if successful; otherwise return false
     //WORK IN PROGRESS - Camryn
-    public bool AddPage (string name, string host)
+    public bool AddPage (string name, string host, ServerGraph S)
     {
         // Check if host exists
 
@@ -166,7 +175,7 @@ public class WebGraph
     // from and to the webpage
     // Return true if successful; otherwise return false
 
-    public bool RemovePage(string name)
+    public bool RemovePage(string name, ServerGraph S)
     {
         return false;
     }
@@ -200,7 +209,7 @@ public class WebGraph
     // Return the average length of the shortest paths from the webpage with
     // given name to each of its hyperlinks
     // Hint: Use the method ShortestPath in the class ServerGraph
-    public float AvgShortestPaths(string name)
+    public float AvgShortestPaths(string name, ServerGraph S)
     {
         return (float)1.0;
     }
