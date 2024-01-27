@@ -395,58 +395,29 @@ public class WebGraph
 
 }
 class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            int i, j;
+        //we may want to add a condition here (if we decided on user input and not hard coding) for adding the very first graph (i.e, connect it to itself)
+        ServerGraph foo = new ServerGraph();
+        WebPage wiki = new WebPage("Wikipedia", "Canada");
 
-            Console.WriteLine("Adjacency Matrix Implemention");
+        foo.AddServer("Canada", "Canada");
+        foo.AddServer("Europe", "Canada");
+        foo.AddServer("Asia", "Europe");
+        foo.AddServer("Africa", "Asia");
+        foo.AddWebPage(wiki, "Canada");
+        foo.AddConnection("Canada", "Asia");
+        foo.AddConnection("Asia", "Africa");
+        foo.AddConnection("Africa", "Canada");
+        foo.AddServer("Australia", "Asia");
+        foo.AddServer("Antartica", "Canada");
 
-            DirectedGraph<char> H = new DirectedGraph<char>(7);
 
-            for (i = 0; i < 7; i++)
-                H.AddVertex((char)(i + 'a'));
+        //foo.RemoveServer("Canada", "Europe");
 
-            H.PrintVertices();
+        foo.PrintGraph();
 
-            for (i = 0; i < 7; i += 2)
-                for (j = 0; j < 7; j += 3)
-                {
-                    H.AddEdge((char)(i + 'a'), (char)(j + 'a'), 10);
-                }
-
-            H.PrintEdges();
-            Console.ReadKey();
-
-            H.RemoveVertex('c');
-            H.RemoveVertex('f');
-
-            H.PrintVertices();
-            H.PrintEdges();
-            Console.ReadKey();
-
-            DirectedGraph<int> G = new DirectedGraph<int>(10);
-
-            for (i = 0; i < 7; i++)
-                G.AddVertex(i);
-
-            G.PrintVertices();
-
-            G.AddEdge(0, 1, 0);
-            G.AddEdge(1, 3, 0);
-            G.AddEdge(1, 4, 0);
-            G.AddEdge(3, 0, 0);
-            G.AddEdge(1, 2, 0);
-            G.AddEdge(2, 5, 0);
-            G.AddEdge(5, 6, 0);
-
-            G.PrintEdges();
-            Console.ReadKey();
-
-            G.DepthFirstSearch();
-            Console.ReadKey();
-
-            G.BreadthFirstSearch();
-            Console.ReadKey();
-        }
+        Console.ReadLine();
     }
+}
