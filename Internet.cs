@@ -400,23 +400,44 @@ class Program
     {
         //we may want to add a condition here (if we decided on user input and not hard coding) for adding the very first graph (i.e, connect it to itself)
         ServerGraph foo = new ServerGraph();
-        WebPage wiki = new WebPage("Wikipedia", "Canada");
-
+        WebGraph foo2 = new WebGraph();
         foo.AddServer("Canada", "Canada");
         foo.AddServer("Europe", "Canada");
         foo.AddServer("Asia", "Europe");
         foo.AddServer("Africa", "Asia");
-        foo.AddWebPage(wiki, "Canada");
+        foo.AddServer("Australia", "Asia");
+        foo.AddServer("Antarctica", "Canada");
+        foo.AddServer("Canada", "Europe");
+        foo.AddServer("US", "Peru");
         foo.AddConnection("Canada", "Asia");
         foo.AddConnection("Asia", "Africa");
         foo.AddConnection("Africa", "Canada");
-        foo.AddServer("Australia", "Asia");
-        foo.AddServer("Antartica", "Canada");
-
-
-        //foo.RemoveServer("Canada", "Europe");
+        foo.AddConnection("America", "Canada");
+        //WebPage wiki = new WebPage("Wikipedia", "Canada");
+        //foo.AddWebPage(wiki, "Canada");
+        foo2.AddPage("Wikipedia", "Canada", foo);
+        foo2.AddPage("Trent", "Canada", foo);
+        foo2.AddPage("Google", "Europe", foo);
+        foo2.AddPage("YouTube", "Asia", foo);
+        foo2.AddPage("GitHub", "America", foo);
+        foo2.AddLink("Google", "Wikipedia");
+        foo2.AddLink("Google", "Trent");
+        foo2.AddLink("Wikipedia", "YouTube");
+        foo2.AddLink("Google", "GitHub");
+        foo.PrintGraph();
+        foo2.PrintGraph();
+        foo2.RemoveLink("YouTube", "Wikipedia");
+        foo2.RemoveLink("Google", "Wikipedia");
+        foo2.RemoveLink("Trent", "Wikipedia");
+        foo2.RemovePage("Wikipedia", foo);
+        foo2.RemovePage("YouTube", foo);
+        foo2.RemovePage("GitHub", foo);
+        foo.RemoveServer("Asia", "Europe");
+        foo.RemoveServer("Africa", "Canada");
+        foo.RemoveServer("Antarctica", "Australia");
 
         foo.PrintGraph();
+        foo2.PrintGraph();
 
         Console.ReadLine();
     }
