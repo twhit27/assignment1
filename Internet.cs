@@ -113,7 +113,7 @@ public class ServerGraph
                 NumServers++;
             }
 
-            Console.WriteLine("Sever {0} successfully added.", name);
+            Console.WriteLine("Server {0} successfully added.", name);
             return true;
         }
         //else the server alredy exists
@@ -131,14 +131,26 @@ public class ServerGraph
         //server in list
         if (find != -1)
         {
-            V[find].P.Add(w);
-            Console.WriteLine("Webpage {0} was is now hosted on server {1}.", w.Name, name);
-            return true;
-        }
+            //Checking if the webpage is already hosted by the server
+            //Go through all of the webpages and check if they are equal to it
+            //I will simplify this if I can find a way - Cam
+            for (int i = 0; i < V[find].P.Count; i++)
+            {
 
-        //else host server doesn't exist
-        Console.WriteLine("Could not find host.");
-        return false;
+                if (V[find].P[i].Equals(w.Name, w.Server))
+                {
+                    //webpage already exists
+                    Console.WriteLine("The server already hosts that webpage.");
+                    return false;
+                }
+            }
+
+            //Add webpage if it does not yet exist on the server
+            V[find].P.Add(w);
+            Console.WriteLine("Webpage {0} is now hosted on server {1}.", w.Name, name);
+            return true;
+           
+        }
     }
 
     // Remove the server with the given name by assigning its connections
@@ -227,20 +239,31 @@ public class ServerGraph
     // the names of the webpages it hosts
     public void PrintGraph()
     {
-        
         for (int i = 0; i < NumServers; i++)
         {
-            Console.Write("\n**Server {0}**\nConnections to: ", V[i].name);
+            //Printing out the server's connections
+            Console.WriteLine("\n**Server {0}**\nConnections to: ", V[i].name);
             for (int j = 0; j < NumServers; j++)
             {
                 if (E[i, j] != false)
                 {
-                    Console.Write("{0}", V[j].name);
+                    Console.WriteLine("{0}", V[j].name);
                 }
-                    
+        
             }
+        
+            //Printing out the webpages the server hosts
+            Console.WriteLine("Hosted web pages: ", V[i].name);
+            for (int j = 0; j < V[i].P.Count; j++)
+            {
+          
+                Console.WriteLine("{0}", V[i].P[j].Name);
+        
+            }
+        
             Console.WriteLine();
         }
+        
     }
 
 }
@@ -276,6 +299,19 @@ public class WebPage
         return -1;
     }
 
+    //Evaluates if two webpages are the same / 'equal to each other'
+    //Returns true if they are equal, and false if they are not equal
+    public bool Equals(string name, string host)
+    {
+        //If the names and hosts of both of the webpages are the same, the webpages are the same
+        if ((Name == name) && (Server == host))
+        {
+            return true;
+        }
+
+        //If they are not return false
+        return false;
+    }
 }
 
 public class WebGraph
@@ -306,7 +342,7 @@ public class WebGraph
     // Return true if successful; otherwise return false
     public bool AddPage (string name, string host, ServerGraph S)
     {
-        // If the page does not exist yet, add it
+        // If the page already exists in the web graph, don't add it
         if (FindPage(name) == -1)
         {
             WebPage p = new WebPage(name, host);
@@ -314,14 +350,18 @@ public class WebGraph
             // Attempt to add the webpage to the server
             // If it is successfully added, add it to the webpage graph
             // This allows us to ensure that the host exists in the server graph
+            // Also allows us to check if the webpage is a duplicate for that server
             if (S.AddWebPage(p, host) == true)
             {
                 P.Add(p); // Add the webpage to the webpage graph
+                Console.WriteLine("Page was successfully added!");
                 return true; // Return true if the webpage was successfully added 
             }
-                
+
+            //Error message will be printed out in AddWebPage if this fails
         }
 
+        Console.WriteLine("Page was not added.");
         return false; // Return false if the webpage was not added
     }
 
@@ -331,6 +371,30 @@ public class WebGraph
 
     public bool RemovePage(string name, ServerGraph S)
     {
+        //Find the location of the page being deleted in the WebGraph
+        int pageIndex = FindPage(name);
+
+        //Only remove page if it does not exist
+        if (pageIndex != -1)
+        {
+            //Go to each page of the WebGraph to check if it has hyperlinks that point to the page being removed
+            for (int j = 0; j < P.Count; j++)
+            {
+                //Go through all of the hyperlinks on the page and delete the hyperlink if it points to the page being removed
+                //Since there are no duplicate hyperlinks, we only have to check for one hyperlink
+                int hypIndex = P[j].FindLink(name);
+                if (hypIndex != -1)
+                {
+                    RemoveLink(P[j].Name, name);
+                }
+            }
+            //Removing the page
+            P.RemoveAt(pageIndex);
+            Console.WriteLine("The page '{0}' was successfully deleted!", name);
+            return true;
+        }
+
+        Console.WriteLine("Page was not removed since it does not exist.");
         return false;
     }
 
@@ -338,20 +402,26 @@ public class WebGraph
     // Return true if successful; otherwise return false
     public bool AddLink(string from, string to)
     {
-            // Checking that both of the pages exist
-            // If they dont, return false
-            if ((FindPage(from) == -1) || (FindPage(to) == -1))
-                return false;
+        // Checking that both of the pages exist
+        // If they dont, return false
+        if ((FindPage(from) == -1) || (FindPage(to) == -1))
+        {
+            Console.WriteLine("Link was not added because at least one of the pages do not exist.");
+            return false;
+        }
 
-            // Checking that the webpage doesn't already have a hyperlink to the webpage
-            // If it does, return false
-            if (P[FindPage(from)].FindLink(to) != -1)
-                return false;
+        // Checking that the webpage doesn't already have a hyperlink to the webpage
+        // If it does, return false
+        if (P[FindPage(from)].FindLink(to) != -1)
+        {
+            Console.WriteLine("Link was not added because {0} already has a hyperlink to {1}.", from, to);
+            return false;
+        }
 
-            // Adding the hyperlink
-            P[FindPage(from)].E.Add(P[FindPage(to)]);
-
-            return true;
+        // Adding the hyperlink
+        P[FindPage(from)].E.Add(P[FindPage(to)]);
+        Console.WriteLine("Hyperlink was successfully added!");
+        return true;
     }
 
     // Remove a hyperlink from one webpage to another
@@ -361,10 +431,15 @@ public class WebGraph
         // Checking that the webpage has a hyperlink to the webpage
         // If it doesn't, return false
         if (P[FindPage(from)].FindLink(to) == -1)
+        {
+            Console.WriteLine("Link was not removed because it does not exist.");
             return false;
+        }
+            
 
         // Removing the hyperlink
         P[FindPage(from)].E.Remove(P[FindPage(to)]);
+        Console.WriteLine("Hyperlink was successfully removed!");
         return true;
     }
 
