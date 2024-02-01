@@ -322,6 +322,7 @@ public class WebGraph
     public WebGraph()
     {
         P = new List<WebPage>(); // Initializing the web graph to have an empty list for webpages
+        Console.WriteLine("The webgraph was created!");
     }
 
     // Return the index of the webpage with the given name; otherwise return -1
