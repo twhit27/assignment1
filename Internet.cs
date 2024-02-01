@@ -449,7 +449,40 @@ public class WebGraph
     // Hint: Use the method ShortestPath in the class ServerGraph
     public float AvgShortestPaths(string name, ServerGraph S)
     {
-        return (float)1.0;
+        int pageIndex = FindPage(name);
+        int avgShortPath, pathSum = 0;
+        string mainHost, linkHost;
+
+        //Checking that the webpage exists
+        if (pageIndex == -1)
+        {
+            Console.WriteLine("AvgShortestPath was not calculated because page does not exist.");
+            return 0;
+        }
+
+        //Checking that the webpage has hyperlinks
+        if (P[pageIndex].E.Count() == 0)
+        {
+            Console.WriteLine("AvgShortestPath was not calculated because page does not have any hyperlinks.");
+            return 0;
+        }
+
+        mainHost = P[pageIndex].Server;
+        Console.WriteLine(mainHost);
+
+        //Find the shortest path to each hyperlink
+        for (int j = 0; j < P[pageIndex].E.Count; j++)
+        {
+            linkHost = P[pageIndex].E[j].Server;
+            pathSum += S.ShortestPath(mainHost, linkHost);
+        }
+
+        //Calculate the average shortest path
+        avgShortPath = pathSum / P[pageIndex].E.Count();
+
+        Console.WriteLine("The average shortest path was successfully calculated and is {0}.", avgShortPath);
+
+        return avgShortPath;
     }
 
     // Print the name and hyperlinks of each webpage
@@ -465,8 +498,7 @@ public class WebGraph
             {
                 Console.WriteLine("    Hyperlink to: "+P[i].E[j].Name);
             }
-        }
-        Console.ReadLine();  
+        } 
     }
 
 }
