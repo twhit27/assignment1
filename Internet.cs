@@ -109,7 +109,10 @@ public class ServerGraph
             else
             {
                 V[NumServers] = server;
+                //Ensuring that both servers are connected to each other
                 E[NumServers, end] = true;
+                E[end, NumServers] = true;
+                
                 NumServers++;
             }
 
@@ -171,7 +174,17 @@ public class ServerGraph
                 //traversing down a column, regardless of value reassign optic cables
                 for (int i = 0; i < NumServers; i++)
                 {
-                    E[i, end] = E[i, start];
+                    //Ensuring not change any of the true values for the other server
+                    if (E[i, end] == false)
+                        E[i, end] = E[i, start];
+                }
+    
+                //traversing across a row, regardless of value reassign optic cables
+                for (int i = 0; i < NumServers; i++)
+                {
+                    //Ensuring not change any of the true values for the other server
+                    if (E[end, i] == false)
+                     E[end, i] = E[start, i];
                 }
 
                 //process of tacking on webpages to the other server
@@ -210,10 +223,15 @@ public class ServerGraph
 
         if (i > -1 && j > -1)
         {
-            if (E[i, j] == false)
+            //Ensuring that both servers are connected to each other
+            if (E[i, j] == false || E[j, i] == false)
+            {
                 E[i, j] = true;
+                E[j, i] = true;
+                return true;
+            }
+                
         }
-
 
         return false;
     }
