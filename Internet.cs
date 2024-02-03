@@ -81,8 +81,9 @@ public class ServerGraph
         E = E2;
     }
 
-    // Add a server (vertex) with the given name and connect it to the other server
+        // Add a server (vertex) with the given name and connect it to the other server
     // Return true if successful; otherwise return false
+    // Shouldn't be able to make a server if there isn't a connecting server
     public bool AddServer(string name, string other)
     {
         int start = FindServer(name);
@@ -98,29 +99,34 @@ public class ServerGraph
             WebServer server = new WebServer();
             server.name = name;
 
-            //if the connecting server doesn't exist yet
-            if (end == -1)
+            //special case for the very first server to be added, which allows it to connect to itself
+            if (end == -1 && V[0] == null)
             {
                 V[NumServers] = server;
                 //simply set the diagonal (loop for now)
                 E[NumServers, NumServers] = true;
                 NumServers++;
             }
-            else
+            else if (end == -1)
             {
                 V[NumServers] = server;
-                //Ensuring that both servers are connected to each other
                 E[NumServers, end] = true;
                 E[end, NumServers] = true;
-                
                 NumServers++;
             }
+            else
+            {
+                Console.WriteLine("{0} server of  already exists.", other);
+                return false;
+            }
+                
 
-            Console.WriteLine("Server {0} successfully added.", name);
+            Console.WriteLine("Sever {0} successfully added.", name);
             return true;
         }
         //else the server alredy exists
-        Console.WriteLine("Server of same name already exists.");
+        //cascading error messages
+        Console.WriteLine("{0} server of  already exists.", name);
         return false;
 
     }
@@ -134,26 +140,14 @@ public class ServerGraph
         //server in list
         if (find != -1)
         {
-            //Checking if the webpage is already hosted by the server
-            //Go through all of the webpages and check if they are equal to it
-            //I will simplify this if I can find a way - Cam
-            for (int i = 0; i < V[find].P.Count; i++)
-            {
-
-                if (V[find].P[i].Equals(w.Name, w.Server))
-                {
-                    //webpage already exists
-                    Console.WriteLine("The server already hosts that webpage.");
-                    return false;
-                }
-            }
-
-            //Add webpage if it does not yet exist on the server
             V[find].P.Add(w);
-            Console.WriteLine("Webpage {0} is now hosted on server {1}.", w.Name, name);
+            Console.WriteLine("Webpage {0} was is now hosted on server {1}.", w.Name, name);
             return true;
-           
         }
+
+        //else host server doesn't exist
+        Console.WriteLine("Could not find host.");
+        return false;
     }
 
     // Remove the server with the given name by assigning its connections
@@ -174,17 +168,7 @@ public class ServerGraph
                 //traversing down a column, regardless of value reassign optic cables
                 for (int i = 0; i < NumServers; i++)
                 {
-                    //Ensuring not change any of the true values for the other server
-                    if (E[i, end] == false)
-                        E[i, end] = E[i, start];
-                }
-    
-                //traversing across a row, regardless of value reassign optic cables
-                for (int i = 0; i < NumServers; i++)
-                {
-                    //Ensuring not change any of the true values for the other server
-                    if (E[end, i] == false)
-                     E[end, i] = E[start, i];
+                    E[i, end] = E[i, start];
                 }
 
                 //process of tacking on webpages to the other server
@@ -212,10 +196,42 @@ public class ServerGraph
         return false;
     }
 
+
+
+    public bool RemoveWebPage(string webpage, string host)
+    {
+        // find the host
+        for (int i = 0; i < NumServers; i++)
+        {
+            //enter into the server
+            if (V[i].name == host)
+            {
+                // loop through webpages associated with host server
+                for (int j = 0; j < V[i].P.Count; j++)
+                {
+                    // find the webpage to remove
+                    if (V[i].P[j].Name == webpage)
+                    {
+                        V[i].P.RemoveAt(j);
+                        return true;
+                    }
+                }
+
+                // if this loop finishes, the webpage doesn't exist
+                Console.WriteLine("Webpage doesn't exist.");
+                return false;
+            }
+        }
+
+        // otherwise server doesn't exist
+        Console.WriteLine("Server doesn't exist.");
+        return false;
+
+    }
+
     // Add a connection from one server to another
     // Return true if successful; otherwise return false
     // Note that each server is connected to at least one other server
-
     public bool AddConnection(string from, string to)
     {
         int i = FindServer(from);
@@ -223,16 +239,15 @@ public class ServerGraph
 
         if (i > -1 && j > -1)
         {
-            //Ensuring that both servers are connected to each other
-            if (E[i, j] == false || E[j, i] == false)
+            if (E[i, j] == false)
             {
                 E[i, j] = true;
                 E[j, i] = true;
+
                 return true;
             }
                 
         }
-
         return false;
     }
 
@@ -240,10 +255,96 @@ public class ServerGraph
     // two or more disjoint graphs if ever one of them would go down
     // Hint: Use a variation of the depth-first search
 
-    public string[] CriticalServers()
+
+    public string[] CritcialServers()
     {
         string[] crits = new string[NumServers];
+        bool[] visited = new bool[NumServers];
+        int count = 0;
+        int before = 0;
+        int after = 0;
+        bool [,] temp = new bool[NumServers, NumServers];
+
+        // standard visited intialization
+        for (int i = 0; i < NumServers; i++)
+            visited[i] = false;
+
+        // first, check for the number of connected components before mods to the matrix using a DFS
+        for (int i = 0; i < NumServers; i++)
+        {
+            if (!visited[i])
+            {
+                DepthFirstSearch(visited);
+                before++;
+            }
+        }
+
+        // main loop removing and checking for breaks
+        for (int i = 0; i < NumServers; i++)
+        {
+            // firstly, reset visited for our new loop and temporarily remove the connections for current server (vertex)
+            for (int j = 0; j < NumServers; j++)
+            {
+                visited[j] = false;
+                temp[i,j] = E[i,j];
+                E[i, j] = E[j, i] = false;
+            }
+
+            // next, for each unvisted server (meaning the DFS of the previous search did not reach it)
+            for (int j = 0; j < NumServers; j++)
+            {
+                // checking that the server has not been visited yet and ignorning the "parent" (orginating) server to focus on adjacent servers
+                // avoiding travseral backwards
+                if (!visited[j]  && j != i)
+                {
+                    // if these conditions are satisfied, increase the number of components and explore adj. servers
+                    after++;
+                    DepthFirstSearch(visited);
+                }
+            }
+
+            // if after the graph has been explored from ith sever, the number of distinct components is larger...
+            if (after > before)
+            {
+                // add the ith server name to the string array I want to return
+                crits[count] = V[i].name;
+                count++;
+            }
+
+            // reset E so that server is returned
+            E = temp;
+        }
+
         return crits;
+
+    }
+
+    public void DepthFirstSearch(bool [] v)
+    {
+        int i;
+        int restarted;
+        bool[] visited = v;
+
+        for (i = 0; i < NumServers; i++)     // Set all vertices as unvisited
+            visited[i] = false;
+
+        for (i = 0; i < NumServers; i++)
+            if (!visited[i])                  // (Re)start with vertex i
+            {
+                DepthFirstSearch(i, visited);
+            }
+    }
+
+    // Professors code for a Depth First Search
+    private void DepthFirstSearch(int i, bool[] visited)
+    {
+        int j;
+
+        visited[i] = true;    // Output vertex when marked as visited
+
+        for (j = 0; j < NumServers; j++)    // Visit next unvisited adjacent vertex
+            if (!visited[j] && E[i, j])
+                DepthFirstSearch(j, visited);
     }
 
  // Return the shortest path from one server to another
