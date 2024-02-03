@@ -228,10 +228,52 @@ public class ServerGraph
         return crits;
     }
 
-    // Return the shortest path from one server to another
+ // Return the shortest path from one server to another
     // Hint: Use a variation of the breadth-first search
     public int ShortestPath(string from, string to)
     {
+        // intialization
+        int count = 0;
+        string path = "";
+        bool[] visited = new bool[NumServers];
+        Queue<int> Q = new Queue<int>();
+
+        // visited will be used to mark nodes as visited
+        for (int i = 0; i < NumServers; i++)
+            visited[i] = false;
+
+        // if both servers exist...
+        if (FindServer(from) != -1 && FindServer(to) != -1)
+        {
+            // since we din't need to traverse the entire graph, start the process at from
+            Q.Enqueue(FindServer(from));
+            visited[FindServer(from)] = true;
+
+            // loop until we arrive at the 'to' server
+            while(Q.Peek() != FindServer(to))
+            {
+                // these 3 lines 'process' the server
+                int i = Q.Dequeue();
+                path = path + V[i].name +" ";
+                count++;
+
+                // from prof's code, move down the line in the matrix checking for server connections
+                for (int j = 0; j < NumServers; j++)
+                {
+                    if (!visited[j] && E[i, j])
+                    {
+                        Q.Enqueue(j);
+                        visited[j] = true;           // Mark vertex as visited
+                    }
+                }
+            }
+
+            Console.WriteLine("The shortest path from {0} to {1} is {2}", from, to, path);
+            return count;
+
+        }
+
+        Console.WriteLine("Either 1 or both server names are invalid");
         return -1;
     }
 
