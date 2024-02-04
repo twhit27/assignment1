@@ -161,40 +161,47 @@ public class ServerGraph
         {
             int start = FindServer(name);
             int end = FindServer(other);
-
-            if (start != -1)
+    
+            if ((start != -1) && (end != -1))
             {
-                if (end != -1)
+                //traversing down a column, regardless of value reassign optic cables
+                for (int i = 0; i < NumServers; i++)
                 {
-                    //traversing down a column, regardless of value reassign optic cables
-                    for (int i = 0; i < NumServers; i++)
-                    {
+                    //Ensuring not change any of the true values for the other server
+                    if (E[i, end] == false)
                         E[i, end] = E[i, start];
-                    }
-
-                    //process of tacking on webpages to the other server
-                    for (int j = 0; j < V[start].P.Count; j++)
-                    {
-                        V[end].P.Add(V[start].P[j]);
-                    }
-
-                    //process of moving last server up into old row & column
-                    NumServers--;
-                    V[start] = V[NumServers];
-                    for (int j = NumServers; j >= 0; j--)
-                    {
-                        E[j, start] = E[j, NumServers];
-                        E[start, j] = E[NumServers, j];
-                    }
-
-                    Console.WriteLine("Server {0} was successfully removed and it's connections moved to {1}.", name, other);
-                    return true;
-
                 }
-
+    
+                //traversing across a row, regardless of value reassign optic cables
+                for (int i = 0; i < NumServers; i++)
+                {
+                    //Ensuring not change any of the true values for the other server
+                    if (E[end, i] == false)
+                     E[end, i] = E[start, i];
+                }
+    
+                //process of tacking on webpages to the other server
+                for (int j = 0; j < V[start].P.Count; j++)
+                {
+                    V[end].P.Add(V[start].P[j]);
+                }
+    
+                //process of moving last server up into old row & column
+                NumServers--;
+                V[start] = V[NumServers];
+                for (int j = NumServers; j >= 0; j--)
+                {
+                    E[j, start] = E[j, NumServers];
+                    E[start, j] = E[NumServers, j];
+                }
+                    
+    
+                Console.WriteLine("Server {0} was successfully removed and it's connections moved to {1}.", name, other);
+                return true;
             }
-            Console.WriteLine("Could not find one of the two servers");
-            return false;
+
+        Console.WriteLine("Could not find one of the two servers");
+        return false;
         }
 
 
