@@ -382,46 +382,87 @@ public class ServerGraph
         public int ShortestPath(string from, string to)
         {
             // intialization
-            int count = 0;
+            int count = 0, fromIndex = FindServer(from), toIndex = FindServer(to);
             string path = "";
             bool[] visited = new bool[NumServers];
             Queue<int> Q = new Queue<int>();
-
+            List<int> pathList = new List<int>();
+    
             // visited will be used to mark nodes as visited
             for (int i = 0; i < NumServers; i++)
                 visited[i] = false;
-
+    
             // if both servers exist...
-            if (FindServer(from) != -1 && FindServer(to) != -1)
+            if (fromIndex != -1 && toIndex != -1)
             {
                 // since we din't need to traverse the entire graph, start the process at from
-                Q.Enqueue(FindServer(from));
-                visited[FindServer(from)] = true;
-
+                Q.Enqueue(fromIndex);
+                visited[fromIndex] = true;
+    
+                //pathList.Add(fromIndex);
+    
+                //Console.WriteLine(FindServer(to));
                 // loop until we arrive at the 'to' server
-                while (Q.Peek() != FindServer(to))
+                while ((!Q.Contains(toIndex)) && (!pathList.Contains(toIndex)))
                 {
+                    //Console.WriteLine(Q.Peek());
                     // these 3 lines 'process' the server
                     int i = Q.Dequeue();
+                    int count2 = 0;
+                    //Console.WriteLine(i);
                     path = path + V[i].name + " ";
+                    pathList.Add(i);
                     count++;
-
+    
+    
                     // from prof's code, move down the line in the matrix checking for server connections
                     for (int j = 0; j < NumServers; j++)
                     {
-                        if (!visited[j] && E[i, j])
+                        if (!visited[j] && E[i, j] && !pathList.Contains(toIndex))
                         {
                             Q.Enqueue(j);
                             visited[j] = true;           // Mark vertex as visited
+                            //pathList.Add(j);
+                            count2++;
                         }
+                        
+                    }
+                    if (count2 == 0)
+                    {
+                        pathList.Remove(i);
+                    }
+                    //if (!Q.Contains(FindServer(to)))
+                    //{
+                    //    pathList.Remove(i);
+                    //}
+    
+                    //pathList.Remove(i);
+    
+                }
+                //Comparing the queue and array to find the shortest path
+                for (int n = 0; n < visited.Length; n++)
+                {
+                    if (visited[n])
+                    {
+                        Console.WriteLine(visited[n]);
+                        Console.WriteLine(n);
+                        
+                    }
+    
+                    if (pathList.Count(x => x == n) > 1)
+                    {
+                        count--;
                     }
                 }
-
+                Console.WriteLine("Path List count {0}:", pathList.Count());
+                pathList.ForEach(Console.WriteLine);
+                //Console.WriteLine(count2);
                 Console.WriteLine("The shortest path from {0} to {1} is {2}", from, to, path);
+            
                 return count;
-
+    
             }
-
+    
             Console.WriteLine("Either 1 or both server names are invalid");
             return -1;
         }
