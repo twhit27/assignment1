@@ -107,7 +107,7 @@ public class ServerGraph
                 E[NumServers, NumServers] = true;
                 NumServers++;
             }
-            else if (end == -1)
+            else if (end != -1)
             {
                 V[NumServers] = server;
                 E[NumServers, end] = true;
