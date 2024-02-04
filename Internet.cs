@@ -1,4 +1,18 @@
-public class ServerGraph
+/*
+ * Assignment 1: The Internet
+ * Jamie Le Neve, Camryn Moerchen, Victoria Whitworth
+ * COIS 3020H
+ * Brian Patrick
+ * February 4, 2024
+ */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace COIS3020HAssignment1
+{
+    public class ServerGraph
     {
         //WebServer constructor
         private class WebServer
@@ -17,7 +31,6 @@ public class ServerGraph
         private WebServer[] V;
         private bool[,] E;
         private int NumServers;
-        int time = 0;
 
         //ServerGraph constructor
         //create an empty server graph
@@ -730,9 +743,11 @@ public class ServerGraph
     {
         static void Main(string[] args)
         {
+            //1. Instantiate a server graph and a web graph
             //we may want to add a condition here (if we decided on user input and not hard coding) for adding the very first graph (i.e, connect it to itself)
             ServerGraph foo = new ServerGraph();
             WebGraph foo2 = new WebGraph();
+            //2. Add a number of servers
             foo.AddServer("Canada", "Canada");
             foo.AddServer("Europe", "Canada");
             foo.AddServer("Asia", "Europe");
@@ -741,25 +756,32 @@ public class ServerGraph
             foo.AddServer("Antarctica", "Canada");
             foo.AddServer("Canada", "Europe");
             foo.AddServer("US", "Peru");
+            //3. Add additional connections between servers
             foo.AddConnection("Canada", "Asia");
             foo.AddConnection("Africa", "Canada");
             foo.AddConnection("Asia", "Africa");
             foo.AddConnection("America", "Canada");
+            //4. Add a number of webpages to various servers
             foo2.AddPage("Wikipedia", "Canada", foo);
             foo2.AddPage("Trent", "Canada", foo);
             foo2.AddPage("Google", "Europe", foo);
             foo2.AddPage("YouTube", "Asia", foo);
             foo2.AddPage("GitHub", "America", foo);
             foo2.AddPage("National Geographic", "Australia", foo);
+            //5. Add hyperlinks between web pages
             foo2.AddLink("Google", "Wikipedia");
             foo2.AddLink("Google", "Trent");
             foo2.AddLink("Wikipedia", "YouTube");
             foo2.AddLink("Google", "GitHub");
-            foo2.AddLink("Google", "National Geographic");
+            foo2.AddLink("National Geographic", "Google");
+            foo2.AddLink("National Geographic", "Trent");
+            foo2.AddLink("National Geographic", "YouTube");
+            //8. Calculate the average shortest distance to hyperlinks of a given webpage
             Console.WriteLine();
-            foo2.AvgShortestPaths("Google", foo);
+            foo2.AvgShortestPaths("National Geographic", foo);
             foo.PrintGraph();
             foo2.PrintGraph();
+            //7. Determine the critical servers of the remaining Internet
             Console.WriteLine();
             Console.WriteLine("Critical Servers: ");
             String[] criticals = foo.CritcialServers();
@@ -767,17 +789,20 @@ public class ServerGraph
             {
                 Console.WriteLine(critical);
             }
-            
+            //5. Remove hyperlinks between the webpages
             foo2.RemoveLink("Wikipedia", "YouTube");
             foo2.RemoveLink("Google", "Wikipedia");
             foo2.RemoveLink("Trent", "Wikipedia");
+            //6. Remove webpages
             foo2.RemovePage("Wikipedia", foo);
             foo2.RemovePage("YouTube", foo);
             foo2.RemovePage("GitHub", foo);
+            //6. Remove servers
             foo.RemoveServer("Asia", "Europe");
             foo.RemoveServer("Africa", "Canada");
             foo.PrintGraph();
             foo2.PrintGraph();
+            //7. Determine the critical servers of the remaining Internet
             Console.WriteLine();
             Console.WriteLine("Critical Servers: ");
             String[] criticals2 = foo.CritcialServers();
@@ -785,12 +810,13 @@ public class ServerGraph
             {
                 Console.WriteLine(critical2);
             }
+            //6. Remove servers
             foo.RemoveServer("Antarctica", "Australia");
             foo.RemoveServer("America", "Canada");
             foo.RemoveServer("Australia", "America");
-            
             foo.PrintGraph();
             foo2.PrintGraph();
+            //7. Determine the critical servers of the remaining Internet
             Console.WriteLine();
             Console.WriteLine("Critical Servers: ");
             String[] criticals3 = foo.CritcialServers();
@@ -798,10 +824,13 @@ public class ServerGraph
             {
                 Console.WriteLine(critical3);
             }
-
+            //8. Calculate the average shortest distance to hyperlinks of a given webpage
+            foo2.AvgShortestPaths("Google", foo);
+            Console.WriteLine();
             foo2.AvgShortestPaths("Trent", foo);
-
-
+            Console.WriteLine();
+            foo2.AvgShortestPaths("Wikipedia", foo);
             Console.ReadLine();
         }
     }
+}
