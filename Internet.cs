@@ -17,6 +17,7 @@ public class ServerGraph
         private WebServer[] V;
         private bool[,] E;
         private int NumServers;
+        int time = 0;
 
         //ServerGraph constructor
         //create an empty server graph
@@ -86,6 +87,7 @@ public class ServerGraph
 
         // Add a server (vertex) with the given name and connect it to the other server
         // Return true if successful; otherwise return false
+        // Shouldn't be able to make a server if there isn't a connecting server
         public bool AddServer(string name, string other)
         {
             int start = FindServer(name);
@@ -118,7 +120,7 @@ public class ServerGraph
                 }
                 else
                 {
-                    Console.WriteLine("Could not find connecting server '{0}'.", other);
+                    Console.WriteLine("{0} server does not exist.", other);
                     return false;
                 }
 
@@ -126,10 +128,11 @@ public class ServerGraph
                 Console.WriteLine("Sever {0} successfully added.", name);
                 return true;
             }
-            
-            //else the 'from' server alredy exists
+            //else the server alredy exists
+            //cascading error messages
             Console.WriteLine("{0} server already exists.", name);
             return false;
+
         }
 
         // Add a webpage to the server with the given name
@@ -161,7 +164,7 @@ public class ServerGraph
         {
             int start = FindServer(name);
             int end = FindServer(other);
-    
+
             if ((start != -1) && (end != -1))
             {
                 //traversing down a column, regardless of value reassign optic cables
@@ -171,21 +174,21 @@ public class ServerGraph
                     if (E[i, end] == false)
                         E[i, end] = E[i, start];
                 }
-    
+
                 //traversing across a row, regardless of value reassign optic cables
                 for (int i = 0; i < NumServers; i++)
                 {
                     //Ensuring not change any of the true values for the other server
                     if (E[end, i] == false)
-                     E[end, i] = E[start, i];
+                        E[end, i] = E[start, i];
                 }
-    
+
                 //process of tacking on webpages to the other server
                 for (int j = 0; j < V[start].P.Count; j++)
                 {
                     V[end].P.Add(V[start].P[j]);
                 }
-    
+
                 //process of moving last server up into old row & column
                 NumServers--;
                 V[start] = V[NumServers];
@@ -194,14 +197,14 @@ public class ServerGraph
                     E[j, start] = E[j, NumServers];
                     E[start, j] = E[NumServers, j];
                 }
-                    
-    
+
+
                 Console.WriteLine("Server {0} was successfully removed and it's connections moved to {1}.", name, other);
                 return true;
             }
 
-        Console.WriteLine("Could not find one of the two servers");
-        return false;
+            Console.WriteLine("Could not find one of the two servers");
+            return false;
         }
 
 
@@ -256,8 +259,10 @@ public class ServerGraph
 
                     return true;
                 }
-
+                Console.WriteLine("A connection between {0} and {1} already exists.", from, to);
+                return false;
             }
+            Console.WriteLine("Could not find one of the two servers");
             return false;
         }
 
@@ -271,19 +276,19 @@ public class ServerGraph
             bool[,] temp = new bool[NumServers, NumServers];
             bool[] visited = new bool[NumServers];
             string[] path = new string[NumServers];
-        
+
             // create a deep copy of E
             for (int i = 0; i < NumServers; i++)
             {
-                for(int j = 0; j < NumServers; j++)
+                for (int j = 0; j < NumServers; j++)
                 {
                     temp[i, j] = E[i, j];
                 }
             }
-        
+
             // MAIN LOOP
             // will perform the delete/restoration for each server
-            for(int i = 0; i < NumServers; i++)
+            for (int i = 0; i < NumServers; i++)
             {
                 // remove the connections (rows & columns) of the ith server, and reset visited servers values
                 for (int j = 0; j < NumServers; j++)
@@ -291,60 +296,63 @@ public class ServerGraph
                     visited[j] = false;
                     E[i, j] = E[j, i] = false;
                 }
-        
+
                 // get the number of servers you can visit with this server removed
                 if (i == 0)
                     after = DepthFirstSearch(1);
                 else
                     after = DepthFirstSearch(0);
-        
+
                 // if you visit less servers than NumServers - 1, that means the graph is split somewhere and this ith server is critical
                 if (after < before - 1)
                 {
                     path[pathCount] = V[i].name;
                     pathCount++;
                 }
-        
+
                 // restore ith connections before moving on to next server
                 for (int j = 0; j < NumServers; j++)
                 {
                     E[i, j] = temp[i, j];
                     E[j, i] = temp[j, i];
                 }
-        
+
             }
-        
+            if (path.All(x => x == null))
+            {
+                Console.WriteLine("No Criticial Servers");
+            }
             return path;
         }
-        
+
         // The following 2 methods are Professor Patricks with two modifictaions:
         // 1) The DFS will only start at a specefied server and go as far as it can, it will not search the whole graph
-            // (supports the critical functionality described in CriticalServer)
+        // (supports the critical functionality described in CriticalServer)
         // 2) It will keep track of how many servers get visited in this one travseral
         public int DepthFirstSearch(int startVertex)
         {
             bool[] visited = new bool[NumServers];
-            int count = 0; 
-        
+            int count = 0;
+
             // Set all vertices as unvisited
             for (int i = 0; i < NumServers; i++)
                 visited[i] = false;
-        
+
             DepthFirstSearch(startVertex, visited, ref count); // Start DFS from the specified server
             return count;
         }
-        
+
         private void DepthFirstSearch(int i, bool[] visited, ref int count)
         {
             visited[i] = true;
-            count++; 
-        
+            count++;
+
             // Visit next unvisited adjacent server
             for (int j = 0; j < NumServers; j++)
             {
                 if (!visited[j] && E[i, j])
                 {
-                    DepthFirstSearch(j, visited, ref count); 
+                    DepthFirstSearch(j, visited, ref count);
                 }
             }
         }
@@ -387,34 +395,31 @@ public class ServerGraph
             bool[] visited = new bool[NumServers];
             Queue<int> Q = new Queue<int>();
             List<int> pathList = new List<int>();
-    
+
             // visited will be used to mark nodes as visited
             for (int i = 0; i < NumServers; i++)
                 visited[i] = false;
-    
+
             // if both servers exist...
             if (fromIndex != -1 && toIndex != -1)
             {
                 // since we din't need to traverse the entire graph, start the process at from
                 Q.Enqueue(fromIndex);
                 visited[fromIndex] = true;
-    
+
                 //pathList.Add(fromIndex);
-    
-                //Console.WriteLine(FindServer(to));
+
                 // loop until we arrive at the 'to' server
                 while ((!Q.Contains(toIndex)) && (!pathList.Contains(toIndex)))
                 {
-                    //Console.WriteLine(Q.Peek());
                     // these 3 lines 'process' the server
                     int i = Q.Dequeue();
                     int count2 = 0;
-                    //Console.WriteLine(i);
                     path = path + V[i].name + " ";
                     pathList.Add(i);
                     count++;
-    
-    
+
+
                     // from prof's code, move down the line in the matrix checking for server connections
                     for (int j = 0; j < NumServers; j++)
                     {
@@ -422,47 +427,31 @@ public class ServerGraph
                         {
                             Q.Enqueue(j);
                             visited[j] = true;           // Mark vertex as visited
-                            //pathList.Add(j);
                             count2++;
                         }
-                        
+
                     }
                     if (count2 == 0)
                     {
                         pathList.Remove(i);
                     }
-                    //if (!Q.Contains(FindServer(to)))
-                    //{
-                    //    pathList.Remove(i);
-                    //}
-    
-                    //pathList.Remove(i);
-    
+
                 }
                 //Comparing the queue and array to find the shortest path
                 for (int n = 0; n < visited.Length; n++)
                 {
-                    if (visited[n])
-                    {
-                        Console.WriteLine(visited[n]);
-                        Console.WriteLine(n);
-                        
-                    }
-    
                     if (pathList.Count(x => x == n) > 1)
                     {
                         count--;
                     }
                 }
                 Console.WriteLine("Path List count {0}:", pathList.Count());
-                pathList.ForEach(Console.WriteLine);
-                //Console.WriteLine(count2);
                 Console.WriteLine("The shortest path from {0} to {1} is {2}", from, to, path);
-            
+
                 return count;
-    
+
             }
-    
+
             Console.WriteLine("Either 1 or both server names are invalid");
             return -1;
         }
@@ -622,6 +611,7 @@ public class ServerGraph
                     }
                 }
                 //Removing the page
+                S.RemoveWebPage(name, P[pageIndex].Server);
                 P.RemoveAt(pageIndex);
                 Console.WriteLine("The page '{0}' was successfully deleted!", name);
                 return true;
@@ -682,7 +672,8 @@ public class ServerGraph
         public float AvgShortestPaths(string name, ServerGraph S)
         {
             int pageIndex = FindPage(name);
-            int avgShortPath, pathSum = 0;
+            float avgShortPath = 0.0f;
+            int pathSum = 0;
             string mainHost, linkHost;
 
             //Checking that the webpage exists
@@ -700,7 +691,7 @@ public class ServerGraph
             }
 
             mainHost = P[pageIndex].Server;
-            Console.WriteLine(mainHost);
+            //Console.WriteLine(mainHost);
 
             //Find the shortest path to each hyperlink
             for (int j = 0; j < P[pageIndex].E.Count; j++)
@@ -710,12 +701,13 @@ public class ServerGraph
             }
 
             //Calculate the average shortest path
-            avgShortPath = pathSum / P[pageIndex].E.Count;
+            avgShortPath = pathSum / (float) P[pageIndex].E.Count;
 
             Console.WriteLine("The average shortest path was successfully calculated and is {0}.", avgShortPath);
 
             return avgShortPath;
         }
+
 
         // Print the name and hyperlinks of each webpage
         public void PrintGraph()
@@ -750,20 +742,22 @@ public class ServerGraph
             foo.AddServer("Canada", "Europe");
             foo.AddServer("US", "Peru");
             foo.AddConnection("Canada", "Asia");
-            foo.AddConnection("Asia", "Africa");
             foo.AddConnection("Africa", "Canada");
+            foo.AddConnection("Asia", "Africa");
             foo.AddConnection("America", "Canada");
-            //WebPage wiki = new WebPage("Wikipedia", "Canada");
-            //foo.AddWebPage(wiki, "Canada");
             foo2.AddPage("Wikipedia", "Canada", foo);
             foo2.AddPage("Trent", "Canada", foo);
             foo2.AddPage("Google", "Europe", foo);
             foo2.AddPage("YouTube", "Asia", foo);
             foo2.AddPage("GitHub", "America", foo);
+            foo2.AddPage("National Geographic", "Australia", foo);
             foo2.AddLink("Google", "Wikipedia");
             foo2.AddLink("Google", "Trent");
             foo2.AddLink("Wikipedia", "YouTube");
             foo2.AddLink("Google", "GitHub");
+            foo2.AddLink("Google", "National Geographic");
+            Console.WriteLine();
+            foo2.AvgShortestPaths("Google", foo);
             foo.PrintGraph();
             foo2.PrintGraph();
             Console.WriteLine();
@@ -782,14 +776,30 @@ public class ServerGraph
             foo2.RemovePage("GitHub", foo);
             foo.RemoveServer("Asia", "Europe");
             foo.RemoveServer("Africa", "Canada");
+            foo.PrintGraph();
+            foo2.PrintGraph();
+            Console.WriteLine();
+            Console.WriteLine("Critical Servers: ");
+            String[] criticals2 = foo.CritcialServers();
+            foreach (String critical2 in criticals2)
+            {
+                Console.WriteLine(critical2);
+            }
             foo.RemoveServer("Antarctica", "Australia");
             foo.RemoveServer("America", "Canada");
             foo.RemoveServer("Australia", "America");
+            
             foo.PrintGraph();
             foo2.PrintGraph();
+            Console.WriteLine();
+            Console.WriteLine("Critical Servers: ");
+            String[] criticals3 = foo.CritcialServers();
+            foreach (String critical3 in criticals3)
+            {
+                Console.WriteLine(critical3);
+            }
 
-
-            //foo2.AvgShortestPaths("Google", foo);
+            foo2.AvgShortestPaths("Trent", foo);
 
 
             Console.ReadLine();
