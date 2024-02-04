@@ -86,7 +86,6 @@ public class ServerGraph
 
         // Add a server (vertex) with the given name and connect it to the other server
         // Return true if successful; otherwise return false
-        // Shouldn't be able to make a server if there isn't a connecting server
         public bool AddServer(string name, string other)
         {
             int start = FindServer(name);
@@ -119,7 +118,7 @@ public class ServerGraph
                 }
                 else
                 {
-                    Console.WriteLine("{0} server does not exist.", other);
+                    Console.WriteLine("Could not find connecting server '{0}'.", other);
                     return false;
                 }
 
@@ -127,11 +126,10 @@ public class ServerGraph
                 Console.WriteLine("Sever {0} successfully added.", name);
                 return true;
             }
-            //else the server alredy exists
-            //cascading error messages
+            
+            //else the 'from' server alredy exists
             Console.WriteLine("{0} server already exists.", name);
             return false;
-
         }
 
         // Add a webpage to the server with the given name
@@ -256,72 +254,92 @@ public class ServerGraph
             return false;
         }
 
-        // Return all servers that would disconnect the server graph into
-        // two or more disjoint graphs if ever one of them would go down
-        // Hint: Use a variation of the depth-first search
-
-
+        // OVERALL METHOD
+        // "Remove" each server 1 at a time, then perform a DFS on the graph, if you visit less servers than the orginal graph - 1, that server is critical
         public string[] CritcialServers()
         {
-            string[] crits = new string[NumServers];
-            bool[] visited = new bool[NumServers];
-            int count = 0;
-            int before = 0;
+            int before = NumServers;    // the functionality of the AddServer method doesn't allow the graph to be split normally, so we can set before to NumServers
             int after = 0;
+            int pathCount = 0;
             bool[,] temp = new bool[NumServers, NumServers];
-
-            // standard visited intialization
-            for (int i = 0; i < NumServers; i++)
-                visited[i] = false;
-
-            // first, check for the number of connected components before mods to the matrix using a DFS
+            bool[] visited = new bool[NumServers];
+            string[] path = new string[NumServers];
+        
+            // create a deep copy of E
             for (int i = 0; i < NumServers; i++)
             {
-                if (!visited[i])
+                for(int j = 0; j < NumServers; j++)
                 {
-                    DepthFirstSearch(visited);
-                    before++;
+                    temp[i, j] = E[i, j];
                 }
             }
-
-            // main loop removing and checking for breaks
-            for (int i = 0; i < NumServers; i++)
+        
+            // MAIN LOOP
+            // will perform the delete/restoration for each server
+            for(int i = 0; i < NumServers; i++)
             {
-                // firstly, reset visited for our new loop and temporarily remove the connections for current server (vertex)
+                // remove the connections (rows & columns) of the ith server, and reset visited servers values
                 for (int j = 0; j < NumServers; j++)
                 {
                     visited[j] = false;
-                    temp[i, j] = E[i, j];
                     E[i, j] = E[j, i] = false;
                 }
-
-                // next, for each unvisted server (meaning the DFS of the previous search did not reach it)
+        
+                // get the number of servers you can visit with this server removed
+                if (i == 0)
+                    after = DepthFirstSearch(1);
+                else
+                    after = DepthFirstSearch(0);
+        
+                // if you visit less servers than NumServers - 1, that means the graph is split somewhere and this ith server is critical
+                if (after < before - 1)
+                {
+                    path[pathCount] = V[i].name;
+                    pathCount++;
+                }
+        
+                // restore ith connections before moving on to next server
                 for (int j = 0; j < NumServers; j++)
                 {
-                    // checking that the server has not been visited yet and ignorning the "parent" (orginating) server to focus on adjacent servers
-                    // avoiding travseral backwards
-                    if (!visited[j] && j != i)
-                    {
-                        // if these conditions are satisfied, increase the number of components and explore adj. servers
-                        after++;
-                        DepthFirstSearch(visited);
-                    }
+                    E[i, j] = temp[i, j];
+                    E[j, i] = temp[j, i];
                 }
-
-                // if after the graph has been explored from ith sever, the number of distinct components is larger...
-                if (after > before)
-                {
-                    // add the ith server name to the string array I want to return
-                    crits[count] = V[i].name;
-                    count++;
-                }
-
-                // reset E so that server is returned
-                E = temp;
+        
             }
-
-            return crits;
-
+        
+            return path;
+        }
+        
+        // The following 2 methods are Professor Patricks with two modifictaions:
+        // 1) The DFS will only start at a specefied server and go as far as it can, it will not search the whole graph
+            // (supports the critical functionality described in CriticalServer)
+        // 2) It will keep track of how many servers get visited in this one travseral
+        public int DepthFirstSearch(int startVertex)
+        {
+            bool[] visited = new bool[NumServers];
+            int count = 0; 
+        
+            // Set all vertices as unvisited
+            for (int i = 0; i < NumServers; i++)
+                visited[i] = false;
+        
+            DepthFirstSearch(startVertex, visited, ref count); // Start DFS from the specified server
+            return count;
+        }
+        
+        private void DepthFirstSearch(int i, bool[] visited, ref int count)
+        {
+            visited[i] = true;
+            count++; 
+        
+            // Visit next unvisited adjacent server
+            for (int j = 0; j < NumServers; j++)
+            {
+                if (!visited[j] && E[i, j])
+                {
+                    DepthFirstSearch(j, visited, ref count); 
+                }
+            }
         }
 
         public void DepthFirstSearch(bool[] v)
