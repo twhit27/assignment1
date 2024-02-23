@@ -26,7 +26,7 @@ public class Rope
         public Node(string ropeString)
         {
             RopeString = ropeString; //Setting the item in the node as the passed item
-            NumChars = 0;
+            NumChars = ropeString.Length;
             Left = Right = null; //Setting the left and right of the node to null
         }
     }
