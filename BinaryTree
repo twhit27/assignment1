@@ -1,0 +1,326 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BinaryTree
+{
+    public class Node<T>
+    {
+        public T Item { get; set; }     // Item stored in the Node
+        public int Order { get; set; }     // Used to record the order that nodes are visited
+        public Node<T> Left { get; set; }     // Left subtree
+        public Node<T> Right { get; set; }     // Right subtree
+
+        Constructor Node
+
+        public Node(T item, int order, Node<T> L, Node<T> R)
+        {
+            Item = item;
+            Order = order;
+            Left = L;
+            Right = R;
+        }
+    }
+
+    ----------------------------------------------------------
+
+    public class BinaryTree<T>
+    {
+        private Node<T> root;        // Reference to the root of the binary tree
+        private int n;               // Number of nodes in the binary tree
+
+        private Random r;            // For building the random binary tree
+
+        Constructor 1: BinaryTree
+        Builds a random binary tree on n nodes
+
+        public BinaryTree(int n)
+        {
+            r = new Random();        // Creates a random variable r
+
+            this.n = n;
+            root = RandomBuild(n);
+        }
+
+        RandomBuild(Preorder)
+         Creates and returns a randomly-built binary tree on n nodes
+         Devroye and Kruszewski, Botanical beauty of random binary trees, Springer, 1996
+
+        public Node<T> RandomBuild(int n)
+        {
+            int left;
+
+            if (n == 0)
+                return null;
+            else
+            {
+                left = (int)(n * r.NextDouble());
+                return new Node<T>(default(T), 0, RandomBuild(left), RandomBuild(n - left - 1));
+            }
+        }
+
+        Constructor 2: Binary Tree
+         Builds a perfectly balanced binary tree given a sorted list L
+
+        public BinaryTree(List<T> L)
+        {
+            root = Build(L, 0, L.Count - 1);
+        }
+
+        Build
+        Recursively builds a perfectly balanced binary tree
+
+        private Node<T> Build(List<T> L, int low, int high)
+        {
+            if (low > high)
+                return null;
+            else
+            {
+                int mid = (low + high) / 2;
+                return new Node<T>(L[mid], 0, Build(L, low, mid - 1), Build(L, mid + 1, high));
+            }
+        }
+
+        ------------------------------------------------------
+
+         Preorder
+         Traverses the binary tree in preorder
+
+        public void Preorder()
+        {
+            int i = 0;
+            Preorder(root, ref i);
+        }
+
+        Private Preorder
+         Recursively implements the preorder traversal
+
+        private void Preorder(Node<T> root, ref int i)
+        {
+            if (root != null)
+            {
+                root.Order = ++i;
+                Preorder(root.Left, ref i);
+                Preorder(root.Right, ref i);
+            }
+        }
+
+        ------------------------------------------------------
+
+         Public Inorder
+         Traverses the binary tree inorder
+
+        public void Inorder()
+        {
+            int i = 0;
+            Inorder(root, ref i);
+        }
+
+        Private Inorder
+         Recursively implements the inorder traversal
+
+        private void Inorder(Node<T> root, ref int i)
+        {
+            if (root != null)
+            {
+                Inorder(root.Left, ref i);
+                root.Order = ++i;
+                Inorder(root.Right, ref i);
+            }
+        }
+
+        ------------------------------------------------------
+
+         Public Postorder
+         Traverses the binary tree in postorder
+
+        public void Postorder()
+        {
+            int i = 0;
+            Postorder(root, ref i);
+        }
+
+        Private Postorder
+         Recursively implements the postorder traversal
+
+        private void Postorder(Node<T> root, ref int i)
+        {
+            if (root != null)
+            {
+                Postorder(root.Left, ref i);
+                Postorder(root.Right, ref i);
+                root.Order = ++i;
+            }
+        }
+
+        ------------------------------------------------------
+
+         Size
+         Returns the number of nodes in a binary tree
+
+        public int Size()
+        {
+            return Size(root);
+        }
+
+        Size
+        Recursively implements public Size
+
+        private int Size(Node<T> root)
+        {
+            if (root == null)
+                return 0;
+            else
+                return Size(root.Left) + Size(root.Right) + 1;
+        }
+
+        ------------------------------------------------------
+
+         Public PrintOrder(Inorder)
+         Outputs the order of each node of binary tree in a 2-D format without edges and rotated 90 degrees
+
+        public void PrintOrder()
+        {
+            PrintOrder(root, 0);
+        }
+
+        Private PrintOrder
+         Recursively implements the public Print
+
+        private void PrintOrder(Node<T> root, int indent)
+        {
+            if (root != null)
+            {
+                PrintOrder(root.Right, indent + 3);
+                Console.WriteLine(new String(' ', indent) + root.Order);
+                PrintOrder(root.Left, indent + 3);
+            }
+        }
+
+        Public PrintItems(Inorder)
+         Outputs the item of each node of binary tree in a 2-D format without edges and rotated 90 degrees
+
+        public void PrintItems()
+        {
+            PrintItems(root, 0);
+        }
+
+        Private PrintItems
+         Recursively implements the public PrintItems
+
+        private void PrintItems(Node<T> root, int indent)
+        {
+            if (root != null)
+            {
+                PrintItems(root.Right, indent + 3);
+                Console.WriteLine(new String(' ', indent) + root.Item);
+                PrintItems(root.Left, indent + 3);
+            }
+        }
+
+        ------------------------------------------------------
+
+         Height
+         Returns the height of a binary tree
+
+        public int Height()
+        {
+            return Height(root);
+        }
+
+        Height
+        Recursively implements the public Height
+
+        private int Height(Node<T> root)
+        {
+            if (root == null)
+                return -1;
+            else
+                return 1 + Math.Max(Height(root.Left), Height(root.Right));
+        }
+
+        ------------------------------------------------------
+
+         IsAVL
+         Returns true if the binary tree represents the structure of an AVL tree; false otherwise
+
+        public bool IsAVL()
+        {
+            return IsAVL(root);
+        }
+
+        IsAVL
+        Recursively implements the public IsAVL
+
+        private bool IsAVL(Node<T> root)
+        {
+            int HL, HR;
+
+            if (root == null)
+                return true;
+            else
+            {
+                HL = Height(root.Left);
+                HR = Height(root.Right);
+                if (Math.Abs(HL - HR) > 1)
+                    return false;
+                else
+                    return IsAVL(root.Left) && IsAVL(root.Right);
+            }
+        }
+    }
+
+    ----------------------------------------------------------
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Random Binary Tree");
+            Console.WriteLine();
+
+            BinaryTree<int> BT = new BinaryTree<int>(10);
+            BT.PrintItems();
+            Console.WriteLine();
+
+            Console.WriteLine("Preorder Traversal");
+            Console.WriteLine();
+            BT.Preorder();
+            BT.PrintOrder();
+            Console.WriteLine();
+
+            Console.WriteLine("Inorder Traversal");
+            Console.WriteLine();
+            BT.Inorder();
+            BT.PrintOrder();
+            Console.WriteLine();
+
+            Console.WriteLine("Postorder Traversal");
+            Console.WriteLine();
+            BT.Postorder();
+            BT.PrintOrder();
+
+            Console.WriteLine();
+            Console.WriteLine("Size   : " + BT.Size());
+            Console.WriteLine("Height : " + BT.Height());
+            Console.WriteLine("IsAVL? : " + BT.IsAVL());
+            Console.WriteLine();
+
+            Console.WriteLine("Perfectly Balanced Binary Tree");
+            Console.WriteLine();
+
+            List<int> L = new List<int>();
+            for (int j = 1; j <= 10; j++)
+                L.Add(j);
+
+            BT = new BinaryTree<int>(L);
+            BT.PrintItems();
+            Console.WriteLine();
+
+            Console.ReadKey();
+        }
+    }
+}
