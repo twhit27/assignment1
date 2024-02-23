@@ -27,6 +27,7 @@ namespace COIS3020Assignment2
             Right = R;
         }
 
+        //just helps identify nodes in the Debugging panel in Visual Studio
         public override string ToString()
         {
             //it's a leaf node
@@ -109,6 +110,7 @@ namespace COIS3020Assignment2
     {
         static void Main(string[] args)
         {
+            // TEST CASES
             //Console.WriteLine("Rope 1: 6 char");
             //String s = "abcdef";
             //Rope<string> rope = new Rope<string>(s);
@@ -129,6 +131,7 @@ namespace COIS3020Assignment2
             Rope<string> rope = new Rope<string>(s);
             //rope.PrintItems();
 
+            //Reading in the file
             StreamReader reader = new StreamReader("C:\\Users\\toryw\\OneDrive\\Desktop\\test.txt");
             s = "";
             string line = "";
