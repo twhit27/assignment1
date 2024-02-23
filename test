@@ -1,0 +1,9 @@
+A_string,_by_definition,_is_a_linear_sequence_of_characters_representing_a_word,_sentence,_or_body_of_text.
+Not surprisingly, strings are an integral and convenient part of most high-level programming languages.
+In C#, strings are supported by the String and StringBuilder library classes which include standard
+methods to concatenate two strings, return a substring, find the character at a given index, find the index
+of a given character, among others. Intuitively, each string is implemented as a linear array of characters
+which for the most part works reasonably well. For methods that retrieve characters or substrings, the
+linear array is ideal. But as a length of the string grows considerably longer as in the case of text, methods
+that require a wholesale shift or copy of characters are slowed by their linear time complexity. The question
+then arises: Can we do better overall for very long strings?
