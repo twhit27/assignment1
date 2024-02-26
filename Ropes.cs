@@ -107,7 +107,7 @@ public class Rope<T>
     //Return the length of the string (1 mark).
     public int Length()
     {
-        return 0;
+        return root.Length;
     }
 
     //ToString Method
@@ -191,9 +191,73 @@ public class Rope<T>
 
     //Rebalance Method
     //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
-    private Node<T> Rebalance()
+    //Note: Will be switched to private once done testing
+    public Node<T> Rebalance()
     {
+        int nodeDepth = 0;
+        //int[] fibSeq = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
+        Node<T>[] minLength = new Node<T>[32];
+
+
+        Console.WriteLine(minLength);
+
+        //If the root node has no children, the tree is balanced
+        if ((root.Left == null) && (root.Right == null)){
+            Console.WriteLine("Rope is balanced");
+            return root;
+        }
+
+     
+        if (root.Left != null)
+        {
+            Rebalance(root.Left, nodeDepth+1, minLength);
+        }
+
+        if (root.Right != null)
+        {
+            Rebalance(root.Right, nodeDepth+1, minLength);
+        }
+        
+
+       
         return root;
+    }
+
+    //Calls Rebalance() recursively
+    private void Rebalance(Node<T> curr, int nodeDepth, Node<T>[] minLength)
+    {
+        //Maybe increase the size of minLength here as the depth increases
+
+        //If the node is a leaf node, insert the node into the appropriate sequence position
+        if (curr.Length <= MAX_LENGTH)
+        {
+            //If there is no node currenlty in the sequence position, add it to that position
+            if (minLength[curr.Length] != null)
+            {
+                minLength[curr.Length] = curr; //Adding the current node to the sequence
+            }
+
+            //If there is a node in the position, concatenate it with the node at that position.
+            else
+            {
+                Node<T> next = Concatenate(curr, minLength[curr.Length]);
+                //minLength[curr.Length] = new Node<T>; //Setting the position the node was at to null
+                Rebalance(next, nodeDepth, minLength);
+            }
+            
+        }
+
+        //If the node is not a leaf node, keep going down
+        if (curr.Left != null)
+        {
+            Rebalance(curr.Left, nodeDepth + 1, minLength);
+        }
+
+        if (curr.Right != null)
+        {
+            Rebalance(curr.Right, nodeDepth + 1, minLength);
+        }
+
     }
 
 
