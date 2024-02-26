@@ -177,9 +177,11 @@ public class Rope<T>
 
     //Concatenate Method
     //Return the root of the rope constructed by concatenating two ropes with roots p and q (3 marks).
-    private Node<T> Concatenate(Node<T> p, Node<T> q)
+    private Node<T> Concatenate (Node<T> p, Node<T> q)
     {
-        return root;
+        Node<T> newRoot = new Node<T>("", (p.Length + q.Length), p, q);
+        //newRoot.Rebalance()
+        return newRoot;
     }
 
     //Split Method
