@@ -114,7 +114,22 @@ public class Rope<T>
     //Return the string represented by the current rope (4 marks).
     public string ToString()
     {
-        return "string";
+        string rope = "";
+        rope = GetString(root, rope);
+        return rope;
+    }
+
+    private string GetString(Node current, string rope)
+    {
+        if (current.Left != null)
+            rope = GetString(current.left, rope);
+        if (current.Right != null)
+            rope = GetString(current.right, rope);
+        if (current.Item != null)
+            rope += current.Item;
+        else
+            return rope;
+        return rope;
     }
 
     //PrintRope Method
@@ -188,7 +203,133 @@ public class Rope<T>
     //Split the rope with root p at index i and return the root of the right subtree (9 marks).
     private Node<T> Split(Node<T> p, int i)
     {
-        return root;
+        Node rightRoot = new Node();
+        if (i > p.Length)
+            rightRoot.Left = SplitRope(p.Left, i, 0, new Node());
+        else if (i > p.Left.Length)
+            rightRoot.Left = SplitRope(p.Left, i, 3, new Node());
+        else if (i == p.Left.Length)
+        {
+            rightRoot.Left = p.Left.Right;
+            rightRoot.Length = p.Length - p.Left.Length;
+            p.Left.Right = null;
+            p.Length = p.Left.Length;
+            p = p.Left;
+        }
+        return rightRoot;
+
+        Node SplitRope(Node current, int i, int directions, Node currRoot)
+        {
+            if (i < current.Length && current.Left != null)
+            {
+                if (directions < 2)
+                {
+                    if (directions == 0)
+                        currRoot = LinkRoot(0);
+                    currRoot = SplitRope(current.Left, i, directions, currRoot);
+                }
+                else
+                {
+                    if (directions == 3)
+                        currRoot = LinkRoot(2);
+                    else
+                        currRoot = LinkRoot(1);
+                    currRoot = SplitRope(current.Left, i, 2, currRoot);
+                }
+            }
+            else if (i > current.Length && current.Right != null)
+            {
+                if (directions < 2)
+                {
+                    if (directions == 0)
+                        currRoot = LinkRoot(1);
+                    else
+                        currRoot = LinkNewRope(0);
+                    currRoot = SplitRope(current.Right, i - current.Length, 1, currRoot);
+                }
+                else
+                {
+                    if (directions == 3)
+                        currRoot = LinkRoot(3);
+                    currRoot = SplitRope(current.Right, i - current.Length, directions, currRoot);
+                }
+            }
+            else if (i == current.Length)
+            {
+                if (directions < 2)
+                {
+                    if (directions == 0)
+                        currRoot = LinkRoot(1);
+                    else if (directions == 1)
+                        currRoot = LinkNewRope(0);
+                }
+                else
+                {
+                    if (directions == 3)
+                        currRoot = LinkRoot(2);
+                    else if (directions == 2)
+                        currRoot = LinkNewRope(1);
+                }
+            }
+            else
+            {
+                current.Left = Build(current.s, 0, i);
+                current.Right = Build(current.s, i, current.Length - i);
+                current.Length = current.Left.Length;
+                current.s = "";
+                currRoot = SplitRope(current, i, directions, currRoot);
+            }
+            return currRoot;
+
+            Node LinkRoot(int linkLocation)
+            {
+                if (linkLocation < 2)
+                {
+                    currRoot.Left = current.Left;
+                    currRoot.Length = current.Length;
+                    if (linkLocation == 1)
+                        current.Left = null;
+                }
+                else
+                {
+                    currRoot.Right = current.Right;
+                    currRoot.Length = current.Length;
+                    if (linkLocation == 2)
+                        current.Right = null;
+                }
+                return currRoot;
+            }
+
+            Node LinkNewRope(int linkLocation)
+            {
+                Node newRope = currRoot;
+                if (linkLocation == 0)
+                {
+                    if (newRope.Right == null)
+                        newRope.Right = current.Left;
+                    else
+                    {
+                        while (newRope.Right.Right != null)
+                            newRope = newRope.Right;
+                        newRope.Right = Concatenate(newRope.Right, current.Left);
+                    }
+                    current.Left = null;
+                }
+                else if (linkLocation == 1)
+                {
+                    if (newRope.Left == null)
+                        newRope.Left = current.Right;
+                    else
+                    {
+                        while (newRope.Left.Left != null)
+                            newRope = newRope.Left;
+                        newRope = Concatenate(current.Right, newRope.Left);
+                    }
+                    current.Right = null;
+                }
+                return currRoot;
+            }
+        }
     }
 
     //Rebalance Method
