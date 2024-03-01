@@ -65,9 +65,7 @@ public class Rope<T>
             {
                 current.Left = Build(S, 0, mid);
                 current.Right = Build(S, mid, S.Length - mid);
-                //current.Left.Length = S.Substring(0, mid).Length;
-                //current.Right.Length = S.Substring(mid, S.Length-mid).Length;
-                current.Length = current.Left.Length + current.Right.Length; // S.Substring(0, mid).Length; //current.Left.Length + current.Right.Length;
+                current.Length = current.Left.Length + current.Right.Length;
             }
             //root = Build(S, 0, S.Length);
         }
@@ -97,7 +95,59 @@ public class Rope<T>
         //Return the index of the first occurrence of S; -1 otherwise (9 marks).
         public int Find(string S)
         {
-            return -1;
+            int i = -1;
+            int rIndex = 0;
+            int sIndex = 0;
+            string buffer = "";
+            bool found = false;
+
+            if (root != null && S != null)
+                Find(root, ref S);
+
+            void Find(Node<T> current, ref string s)
+            {
+                if (!found)
+                {
+                    if (current.Left != null)
+                        Find(current.Left, ref s);
+                    if (s.Length > 0)
+                        if (current.Item.Contains(s[0]))
+                        {
+                            if (buffer.Length == 0)
+                                i = current.Item.IndexOf(s[0]) + rIndex;
+                            for (int j = current.Item.IndexOf(s[0]); j < current.Item.Length && sIndex < s.Length; j++)
+                            {
+                                if (current.Item[j] == s[sIndex])
+                                {
+                                    buffer += s[sIndex];
+                                    sIndex++;
+                                }
+                                else
+                                {
+                                    //found = false;
+                                    buffer = "";
+                                    sIndex = 0;
+                                    i = -1;
+                                }
+                                Console.WriteLine("Buffer: " + buffer);
+                            }
+                            s = s.Substring(sIndex);
+                            sIndex = 0;
+                            if (s.Length == 0)
+                                found = true;
+                        }
+                    rIndex += current.Item.Length;
+                    i += current.Item.Length;
+                    if (current.Right != null && s.Length > 0)
+                        Find(current.Right, ref s);
+                }
+            }
+            if (!found)
+                i = -1;
+            Console.WriteLine(buffer);
+            Console.WriteLine(sIndex);
+            //Console.WriteLine(rIndex);
+            return i;
         }
 
         //CharAt Method
@@ -111,7 +161,29 @@ public class Rope<T>
         //Return the index of the first occurrence of character c (4 marks).
         public int IndexOf(char c)
         {
-            return -1;
+            int i = -1;
+            int index = 0;
+            bool found = false;
+            if (root != null)
+                IndexOf(root, c);
+
+            void IndexOf(Node<T> current, char c)
+            {
+                if (!found)
+                {
+                    if (current.Left != null)
+                        IndexOf(current.Left, c);
+                    if (root.Item.Contains(c))
+                    {
+                        found = true;
+                        i = current.Item.IndexOf(c) + index;
+                    }
+                    index += current.Item.Length;
+                    if (current.Right != null)
+                        IndexOf(current.Right, c);
+                }
+            }
+            return i;
         }
 
         //Reverse Method
@@ -194,10 +266,8 @@ public class Rope<T>
             if (sub.Length <= MAX_LENGTH)
             {
                 // return a new leaf node to hook onto the parent node being passed
-                //string sub = s.Substring(i, j - i);
                 current.Length = sub.Length;
                 current.Item = sub;
-                //return new Node<T>(sub, sub.Length, null, null);
             }
             // this block handles parent nodes and drives the recursion
             // essentially, it will continously split the string into 2 until the sections are at or below max node length
@@ -206,9 +276,7 @@ public class Rope<T>
                 int mid = sub.Length / 2;   //mid will provide the middle point value that allows the following code to split the string in half
                 current.Left = Build(sub, 0, mid);    // create the left subtree by using new indexes to pass the first half of the substring
                 current.Right = Build(sub, mid, sub.Length - mid);   // create the right subtree by using indexes to pass the second half
-                current.Length = current.Left.Length + current.Right.Length; // sub.Substring(0, mid).Length; // current.Left.Length + current.Right.Length;
-                //int len = left.Length + right.Length;   // update parent node length accordingly
-                //return new Node<T>("", len, left, right);   // return parent node
+                current.Length = current.Left.Length + current.Right.Length; // update parent node length accordingly
             }
             return current;
 
@@ -841,6 +909,12 @@ public class Rope<T>
             Console.WriteLine();
             Console.WriteLine("Spliting the Rope");
             rope.SplitRope(15);
+            Console.Write("Index of first occurrence of ing: ");
+            Console.WriteLine(rope.Find("ing"));
+            Console.Write("Index of first occurrence of c: ");
+            Console.WriteLine(rope.Find("c"));
+            Console.Write("Index of first occurrence of z: ");
+            Console.WriteLine(rope.Find("z"));
 
             //Reading in the file
 
