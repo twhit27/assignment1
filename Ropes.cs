@@ -124,12 +124,10 @@ public class Rope<T>
                                 }
                                 else
                                 {
-                                    //found = false;
                                     buffer = "";
                                     sIndex = 0;
                                     i = -1;
                                 }
-                                Console.WriteLine("Buffer: " + buffer);
                             }
                             s = s.Substring(sIndex);
                             sIndex = 0;
@@ -144,9 +142,6 @@ public class Rope<T>
             }
             if (!found)
                 i = -1;
-            Console.WriteLine(buffer);
-            Console.WriteLine(sIndex);
-            //Console.WriteLine(rIndex);
             return i;
         }
 
@@ -401,6 +396,10 @@ public class Rope<T>
                     p = p.Left;
                 }
             }
+            ReassignLength(rightRoot);
+            compressRope(rightRoot);
+            ReassignLength(root);
+            compressRope(root);
             return rightRoot;
             // Method to assist in the split of the string
             // Traverses the rope to find the node that contains the index
@@ -791,6 +790,145 @@ public class Rope<T>
                         current.Right = null;
                     }
                     return currRoot;
+                }
+            }
+        }
+
+        // Helper method for the split method to recalculate the lengths of the nodes after the rope is split 
+        private void ReassignLength (Node<T> currRoot)
+        {
+            if (currRoot != null)
+            {
+                // If there is a node on the left
+                if (currRoot.Left != null)
+                {
+                    // If there is a node on the right
+                    if (currRoot.Right != null)
+                    {
+                        ReassignLength(currRoot.Left);
+                        ReassignLength(currRoot.Right);
+                        // Update the length of the parent node
+                        currRoot.Length = currRoot.Left.Length + currRoot.Right.Length;
+                    }
+                    // If there is no right node
+                    else
+                    {
+                        ReassignLength(currRoot.Left);
+                        // Updating the length of parent node
+                        currRoot.Length = currRoot.Left.Length;
+                    }
+                }
+                // If there is a node on the right 
+                else if (currRoot.Right != null)
+                {
+                    // If there is a node on the left
+                    if (currRoot.Left != null)
+                    {
+                        ReassignLength(currRoot.Right);
+                        ReassignLength(currRoot.Left);
+                        currRoot.Length = currRoot.Left.Length + currRoot.Right.Length;
+                    }
+                    // If there is no node on the left
+                    else
+                    {
+                        ReassignLength(currRoot.Right);
+                        // Update the length of the parent node
+                        currRoot.Length = currRoot.Right.Length;
+                    }
+                }
+            }
+        }
+
+        // Additional Optimizations 1
+        // After a split, compress the path back to the root to ensure that binary tree is full, i.e. each non-leaf node has two non-empty children
+        private void compressRope (Node<T> currRoot)
+        {
+            Node<T> temp = new Node<T>("", 0, null, null);
+            if (currRoot != null)
+            {
+                // If there is a node on the left
+                if (currRoot.Left != null)
+                {
+                    // If there is a node on the right
+                    if (currRoot.Right != null)
+                    {
+                        compressRope(currRoot.Left);
+                        compressRope(currRoot.Right);
+                    }
+                    // If the right node is empty
+                    else
+                    {
+                        // If the left node has two non-empty chidlren
+                        if (currRoot.Left.Left != null && currRoot.Left.Right != null)
+                        {
+                            temp = currRoot.Left;
+                            currRoot.Right = currRoot.Left.Right;
+                            currRoot.Left = currRoot.Left.Left;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            return;
+                        }
+                        // If the left node has an empty child
+                        else if (currRoot.Left.Left == null || currRoot.Left.Right == null)
+                        {
+                            temp = currRoot.Left;
+                            currRoot.Right = currRoot.Left.Right;
+                            currRoot.Left = currRoot.Left.Left;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            // If the node is a leaf node
+                            if (currRoot.Left.Item != "")
+                            {
+                                currRoot.Item = currRoot.Left.Item;
+                                currRoot.Left = null;
+                                return;
+                            }
+                            compressRope(currRoot.Left);
+                            currRoot.Left = null;
+                        }
+                    }
+                }
+                // If there is a node on the right side
+                else if (currRoot.Right != null)
+                {
+                    // If there is a node on the left side
+                    if (currRoot.Left != null)
+                    {
+                        compressRope(currRoot.Right);
+                        compressRope(currRoot.Left);
+                    }
+                    // If there is an empty child node
+                    else
+                    {
+                        // If the right node has two non-empty children
+                        if (currRoot.Right.Right != null && currRoot.Right.Left != null)
+                        {
+                            temp = currRoot.Right;
+                            currRoot.Left = currRoot.Right.Left;
+                            currRoot.Right = currRoot.Right.Right;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            return;
+                        }
+                        // If the right node has an empty child
+                        else if (currRoot.Right.Right == null || currRoot.Right.Left == null)
+                        {
+                            temp = currRoot.Right;
+                            currRoot.Left = currRoot.Right.Left;
+                            currRoot.Right = currRoot.Right.Right;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            // If the right node is a leaf node
+                            if (currRoot.Right.Item != "")
+                            {
+                                currRoot.Item = currRoot.Right.Item;
+                                currRoot.Right = null;
+                                return;
+                            }
+                            compressRope(currRoot.Right);
+                            currRoot.Right = null;
+                        }
+                    }
                 }
             }
         }
