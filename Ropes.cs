@@ -964,80 +964,165 @@ public class Rope<T>
         }
 
 
-        //Rebalance Method
-        //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
-        //Note: Will be switched to private once done testing
-        public Node<T> Rebalance()
+    //Rebalance Method
+    //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
+    //Note: Will be switched to private once done testing
+    public Node<T> Rebalance()
+    {
+        List<int> fibSeq = new List<int> {1, 2};
+        Node<T>[] minLength;
+        Node<T> branch1 = new Node<T>("", 0, null, null);
+        Node<T> branch2 = new Node<T>("", 0, null, null);
+
+        //Building the fibonnaci sequence up until the total length of the rope
+        for (int i =1; fibSeq[i] <= root.Length; i++)
         {
-            int nodeDepth = 0;
-            //int[] fibSeq = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
-            Node<T>[] minLength = new Node<T>[32];
+            fibSeq.Add(fibSeq[i] + fibSeq[i - 1]);
+        }
 
+        // Reversing the list to match the paper's implementation better
+        fibSeq.Reverse();
 
-            Console.WriteLine(minLength);
+        minLength = new Node<T>[fibSeq.Count]; //Creating an array of nodes the size of the sequence to store nodes in
 
-            //If the root node has no children, the tree is balanced
-            if ((root.Left == null) && (root.Right == null))
-            {
-                Console.WriteLine("Rope is balanced");
-                return root;
-            }
-
-
-            if (root.Left != null)
-            {
-                Rebalance(root.Left, nodeDepth + 1, minLength);
-            }
-
-            if (root.Right != null)
-            {
-                Rebalance(root.Right, nodeDepth + 1, minLength);
-            }
-
-
-
+        //If the root node has no children, the tree is balanced
+        if ((root.Left == null) && (root.Right == null))
+        {
+            Console.WriteLine("Rope is balanced");
             return root;
         }
 
-        //Calls Rebalance() recursively
-        private void Rebalance(Node<T> curr, int nodeDepth, Node<T>[] minLength)
+        //Move through the tree until you get through all the leaves, starting on the left
+        if (root.Left != null)
         {
-            //Maybe increase the size of minLength here as the depth increases
+            Rebalance(root.Left, fibSeq, minLength);
+        }
 
-            //If the node is a leaf node, insert the node into the appropriate sequence position
-            if (curr.Length <= MAX_LENGTH)
+        if (root.Right != null)
+        {
+            Rebalance(root.Right, fibSeq, minLength);
+        }
+
+        //Once you've finished adding all the nodes to minLength, concatenate them all together into one tree
+        //There should only be two nodes to concatenate together
+        for (int n = 0; n <= minLength.Length-1; n++)
+        {
+            //Getting the first/largest branch in minLength
+            if (branch1.Length == 0 && minLength[n] != null)
             {
-                //If there is no node currenlty in the sequence position, add it to that position
-                if (minLength[curr.Length] != null)
+                branch1 = minLength[n];
+            }
+
+            //Getting the second/smaller in minLength
+            else if (branch2.Length == 0 && minLength[n] != null)
+            {
+                //Checking that the node there is a balance rope
+                if (minLength[n].Right != null && minLength[n].Left != null)
                 {
-                    minLength[curr.Length] = curr; //Adding the current node to the sequence
+                    branch2 = minLength[n];
                 }
 
-                //If there is a node in the position, concatenate it with the node at that position.
+                //If it's not, split it into two seperate strings
                 else
                 {
-                    Node<T> next = Concatenate(curr, minLength[curr.Length]);
-                    //minLength[curr.Length] = new Node<T>; //Setting the position the node was at to null
-                    Rebalance(next, nodeDepth, minLength);
+                    int strLength = minLength[n].Length;
+                    int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
+
+                    //Getting the first and second strings
+                    string firstString = minLength[n].Item.Substring(0, middle);
+                    string secondString = minLength[n].Item.Substring(middle);
+
+                    //Making the nodes
+                    Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
+                    Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
+
+                    branch2 = Concatenate(node1, node2);
+
                 }
-
             }
+        }
 
-            //If the node is not a leaf node, keep going down
-            if (curr.Left != null)
+        root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
+        return root;
+    }
+
+    //Rebalance II
+    //Calls itself recursively to move through the tree
+    private void Rebalance(Node<T> curr, List<int> fibSeq, Node<T>[] minLength)
+    {
+        bool added = false;
+        Node<T> conNode;
+
+        //If the node is a leaf node, insert the node into the appropriate position
+        if (curr.Left == null && curr.Right == null)
+        {
+            //Moving through the array until the length of the string fits in the interval
+            for(int i = 0; curr.Length < fibSeq[i]; i++)
             {
-                Rebalance(curr.Left, nodeDepth + 1, minLength);
-            }
+                if (curr.Length < fibSeq[i] && curr.Length >= fibSeq[i+1])
+                {
+                    //Checking to see if that position in the minLength array is empty
+                    if (minLength[i+1] == null)
+                    {
+                        for(int j = i+2; fibSeq.Count > j; j++)
+                        {
+                            //If there is a node in the smaller numbers of the fibonnaci sequence, concatenate the two nodes together
+                            if (minLength[j] != null)
+                            {
+                                conNode = Concatenate(minLength[j], curr);
+                                minLength[j] = null; //Set it to null after moving it
 
-            if (curr.Right != null)
-            {
-                Rebalance(curr.Right, nodeDepth + 1, minLength);
+                                //If the concatenation causes the length to increase over the interval, put in the correct position
+                                if (fibSeq[i] <= conNode.Length && fibSeq[i-1] > conNode.Length)
+                                {
+                                    minLength[i] = conNode;
+                                    added = true;
+                                }
+                                //If not, put it in the orignal spot
+                                else
+                                {
+                                    minLength[i+1] = conNode;
+                                    added = true;
+                                }
+                            }
+                        }
+
+                        //If not, directly add the node to minLength
+                        if (added == false)
+                        {
+                            minLength[i + 1] = curr;
+                        }
+ 
+                        
+                    }
+                    //If that position is not empty, concatenate the two nodes and call rebalance again to find the proper position
+                    else
+                    {
+                        Rebalance(Concatenate(curr, minLength[i+1]), fibSeq, minLength);
+                    }
+                }
             }
+         
 
         }
 
+        //If the node is not a leaf node, keep going down
+        if (curr.Left != null)
+        {
+            Rebalance(curr.Left, fibSeq, minLength);
+        }
+        
+        //Once done going down the left, go down the right
+        if (curr.Right != null)
+        {
+            Rebalance(curr.Right, fibSeq, minLength);
+        }
 
     }
+
+
+}
+
 
     // NOTES 
     // My code will favour putting the bigger substring in the right subtree, whereas his example favours the left, I don't think it matters
@@ -1087,6 +1172,9 @@ public class Rope<T>
             Console.WriteLine();
             Console.WriteLine("Spliting the Rope");
             rope.SplitRope(15);
+            rope.Rebalance();
+            Console.WriteLine("Printing the Rebalanced Rope");
+            rope.PrintRope();
             Console.Write("Index of first occurrence of ing: ");
             Console.WriteLine(rope.Find("ing"));
             Console.Write("Index of first occurrence of c: ");
