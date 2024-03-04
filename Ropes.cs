@@ -145,12 +145,42 @@ public class Rope<T>
             return i;
         }
 
-        //CharAt Method
-        //Return the character at index i (3 marks).
-        public char CharAt(int i)
+    //CharAt Method
+    //Return the character at index i (3 marks).
+    //Inspired by Brian Patrick's augmented treap rank method
+    public char CharAt(int i)
+    {
+        Node<T> p = root;
+        bool found = false;
+
+        int strIndex = i; //Index of the character within the tree
+
+        //Checking that the index given is less than the root
+        //If the index is not less than the root's length, the character does not exist in the rope
+        if (p.Length-1 < i)
+            return ' ';
+
+        //Move through the tree until the leaf node containing the character is found
+        while (!found)
         {
-            return 'i';
+            //If the index is greater than half of the length of the current node, move right
+            if (p.Length/2 <= strIndex) 
+            {
+                p = p.Right;              
+                strIndex -= p.Length; //Adjust the index to account for moving down the rope
+            }
+            //If not, move down the left
+            else
+                p = p.Left;
+            
+           //Once at the leaf node containing the character, set found to true
+            if (p.Right == null && p.Left == null)
+                found = true;
+            
         }
+
+        return p.Item[strIndex];     //Return the character at the given index within the string
+    }
 
         //IndexOf Method
         //Return the index of the first occurrence of character c (4 marks).
@@ -1042,6 +1072,16 @@ public class Rope<T>
             Rope<string> rope = new Rope<string>(s);
             rope.PrintRope();
             Console.WriteLine();
+            Console.Write("Character at index 43: ");
+            Console.WriteLine(rope.CharAt(43));
+            Console.Write("Character at index 30: ");
+            Console.WriteLine(rope.CharAt(30));
+            Console.Write("Character at index 22: ");
+            Console.WriteLine(rope.CharAt(22));
+            Console.Write("Character at index 15: ");
+            Console.WriteLine(rope.CharAt(15));
+            Console.Write("Character at index 3: ");
+            Console.WriteLine(rope.CharAt(3));
             Console.WriteLine("Printing Rope as a String");
             Console.WriteLine(rope.ToString());
             Console.WriteLine();
