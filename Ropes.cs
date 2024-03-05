@@ -211,12 +211,35 @@ public class Rope<T>
             return i;
         }
 
-        //Reverse Method
-        //Reverse the string represented by the current rope (5 marks).
-        public void Reverse()
-        {
 
+    //Reverse Method
+    //Reverse the string by swapping children recursivley
+    public void Reverse()
+    {
+        Reverse(root);
+    }
+
+    private Node<T> Reverse(Node<T> parent)
+    {
+        Node<T> temp = new Node<T>(parent.Item, parent.Length, parent.Left, parent.Right);
+
+        if (parent.Item != "")
+        {
+            //reverse string approach from https://www.educative.io/answers/how-to-reverse-a-string-in-c-sharp
+            char[] sArray = temp.Item.ToCharArray();
+            Array.Reverse(sArray);
+            string reversed = new string(sArray);
+            parent.Item = reversed;
+            return parent;
         }
+        else
+        {
+            parent.Left = Reverse(temp.Right);
+            parent.Right = Reverse(temp.Left);
+        }
+
+        return parent;
+    }
 
         //Length Method
         //Return the length of the string (1 mark).
