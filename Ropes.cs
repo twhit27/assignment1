@@ -7,9 +7,8 @@
  */
 
 using System;
-using System.Data.SqlTypes;
-using System.Reflection;
-
+using System.IO;
+using System.Collections.Generic;
 
 public class Rope<T>
     {
@@ -370,16 +369,16 @@ public class Rope<T>
                 // Rope will be split on the left side of the current node
                 if (i - p.Right.Length < p.Right.Length)
                 {
-                    // Getting a status update on the variables
+                    /* Getting a status update on the variables
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("i - p.Right: ");
                     Console.WriteLine(i - p.Right.Length);
                     Console.Write("p.Right: ");
-                    Console.WriteLine(p.Right.Length);
+                    Console.WriteLine(p.Right.Length);*/
 
                     rightRoot.Left = root.Left;
-                    rightRoot.Right = SplitRopeLeft(p.Right, i - 20, 0, new Node<T>("", 0, null, null));
+                    rightRoot.Right = SplitRope(p.Right, i - p.Right.Length, 0, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
                     root.Left = null;
                 }
@@ -394,7 +393,7 @@ public class Rope<T>
                     Console.Write("p.Right: ");
                     Console.WriteLine(p.Right.Length);*/
                     rightRoot.Left = root.Left;
-                    rightRoot.Right = SplitRopeLeft(p.Right, i - 20, 3, new Node<T>("", 0, null, null));
+                    rightRoot.Right = SplitRope(p.Right, i - p.Right.Length, 3, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
                     root.Left = null;
                 }
@@ -424,7 +423,7 @@ public class Rope<T>
                     Console.Write("p.Left: ");
                     Console.WriteLine(p.Left.Length);*/
 
-                    rightRoot.Left = SplitRopeLeft(p.Left, i, 0, new Node<T>("", 0, null, null));
+                    rightRoot.Left = SplitRope(p.Left, i, 0, new Node<T>("", 0, null, null));
                 }
                 // rope will be split on the right side of the current node
                 else if (i - p.Left.Length > p.Left.Length)
@@ -437,12 +436,12 @@ public class Rope<T>
                     Console.WriteLine(p.Left.Length - i);
                     Console.Write("p.Left: ");
                     Console.WriteLine(p.Left.Length);*/
-                    rightRoot.Left = SplitRopeLeft(p.Left, i, 3, new Node<T>("", 0, null, null));
+                    rightRoot.Left = SplitRope(p.Left, i, 3, new Node<T>("", 0, null, null));
                 }
                 // rope will be split on the current node
                 else if (i - p.Left.Length == 0)
                 {
-                    Console.WriteLine("i - p.Left.Length == 0");
+                    //Console.WriteLine("i - p.Left.Length == 0");
                     rightRoot.Left = p.Left.Right;
                     rightRoot.Length = p.Length - p.Left.Length;
                     p.Left.Right = null;
@@ -456,25 +455,25 @@ public class Rope<T>
             compressRope(root);
             return rightRoot;
             
-            Node<T> SplitRopeLeft(Node<T> current, int i, int directions, Node<T> currRoot)
+            Node<T> SplitRope(Node<T> current, int i, int directions, Node<T> currRoot)
             {
                 Console.WriteLine("current.Length > i");
                 // Rope will be split on the left side of the current node
-                if (current.Length - i > 10 && current.Left != null)
+                if (current.Length - i > MAX_LENGTH && current.Left != null)
                 {
-                    // Getting a status update on the variables
+                    /* Getting a status update on the variables
                     Console.WriteLine("i > current.Length: ");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("current.Length - i: ");
                     Console.WriteLine(current.Length - i);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);
+                    Console.WriteLine(current.Length);*/
                     if (directions < 2)
                     {
                         if (directions == 0)
                             currRoot = LinkRoot(0);
-                        currRoot = SplitRopeLeft(current.Left, i, directions, currRoot);
+                        currRoot = SplitRope(current.Left, i, directions, currRoot);
                     }
                     else
                     {
@@ -482,20 +481,20 @@ public class Rope<T>
                             currRoot = LinkRoot(2);
                         else
                             currRoot = LinkRoot(1);
-                        currRoot = SplitRopeLeft(current.Left, i, 2, currRoot);
+                        currRoot = SplitRope(current.Left, i, 2, currRoot);
                     }
                 }
                 // rope will be split on the left side of the current node
                 else if (current.Length - i > 0 && current.Right != null)
                 {
-                    // Getting a status update on the variables
+                    /* Getting a status update on the variables
                     Console.WriteLine("i < current.Length");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("current.Length - i: ");
                     Console.WriteLine(current.Length - i);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);
+                    Console.WriteLine(current.Length);*/
                     //Console.WriteLine("Current:");
                     //PrintRope(current, 0);
                     if (directions < 2)
@@ -504,26 +503,26 @@ public class Rope<T>
                             currRoot = LinkRoot(1);
                         else
                             currRoot = LinkNewRope(0);
-                        currRoot = SplitRopeLeft(current.Right, current.Length - i, 1, currRoot);
+                        currRoot = SplitRope(current.Right, current.Length - i, 1, currRoot);
                     }
                     else
                     {
                         if (directions == 3)
                             currRoot = LinkRoot(3);
-                        currRoot = SplitRopeLeft(current.Right, current.Length - i, directions, currRoot);
+                        currRoot = SplitRope(current.Right, current.Length - i, directions, currRoot);
                     }
                 }
                 // rope will be split on the current node
                 else if (current.Length - i == 0)
                 {
-                    // Getting a status update on the variables
+                    /* Getting a status update on the variables
                     Console.WriteLine("i == current.Length");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("i - current.Length: ");
                     Console.WriteLine(i - current.Length);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);
+                    Console.WriteLine(current.Length);*/
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -542,15 +541,15 @@ public class Rope<T>
                 // rope will be split on the current node
                 else
                 {
-                    Console.WriteLine("i == current.Length");
+                    /*Console.WriteLine("i == current.Length");
                     Console.Write("i: ");
                     Console.WriteLine(i);
-                    Console.WriteLine("SplitRope else");
+                    Console.WriteLine("SplitRope else");*/
                     current.Left = Build(current.Item, 0, i);
                     current.Right = Build(current.Item, i, current.Length - i);
                     current.Length = current.Left.Length;
                     current.Item = "";
-                    currRoot = SplitRopeLeft(current, i, directions, currRoot);
+                    currRoot = SplitRope(current, i, directions, currRoot);
                 }
 
 
@@ -663,6 +662,7 @@ public class Rope<T>
             Node<T> temp = new Node<T>("", 0, null, null);
             if (currRoot != null)
             {
+                //PrintRope(currRoot, 0);
                 // If there is a node on the left
                 if (currRoot.Left != null)
                 {
@@ -683,25 +683,33 @@ public class Rope<T>
                             currRoot.Left = currRoot.Left.Left;
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
-                            return;
+                            compressRope(currRoot.Right);
+                            compressRope(currRoot.Left);
                         }
-                        // If the left node has an empty child
-                        else if (currRoot.Left.Left == null || currRoot.Left.Right == null)
+                        else if (currRoot.Left.Left != null)
                         {
                             temp = currRoot.Left;
-                            currRoot.Right = currRoot.Left.Right;
                             currRoot.Left = currRoot.Left.Left;
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
-                            // If the node is a leaf node
-                            if (temp.Item != "")
-                            {
-                                currRoot.Item = temp.Item;
-                                currRoot.Left = null;
-                                return;
-                            }
                             compressRope(currRoot.Left);
+                        }
+                        else if(currRoot.Left.Right != null)
+                        {
+                            temp = currRoot.Left;
+                            currRoot.Right = currRoot.Left.Right;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            compressRope(currRoot.Right);
+                        }
+                        // If the left node has an empty child
+                        else if (currRoot.Left.Left == null)
+                        {
+                            temp = currRoot.Left;
                             currRoot.Left = null;
+                            currRoot.Right = null;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
                         }
                     }
                 }
@@ -725,28 +733,38 @@ public class Rope<T>
                             currRoot.Right = currRoot.Right.Right;
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
-                            return;
+                            compressRope(currRoot.Right);
+                            compressRope(currRoot.Left);
                         }
-                        // If the right node has an empty child
-                        else if (currRoot.Right.Right == null || currRoot.Right.Left == null)
+                        else if (currRoot.Right.Right != null)
                         {
                             temp = currRoot.Right;
-                            currRoot.Left = currRoot.Right.Left;
                             currRoot.Right = currRoot.Right.Right;
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
-                            // If the right node is a leaf node
-                            if (temp.Item != "")
-                            {
-                                currRoot.Item = temp.Item;
-                                currRoot.Right = null;
-                                return;
-                            }
                             compressRope(currRoot.Right);
+                        }
+                        else if (currRoot.Right.Left != null)
+                        {
+                            temp = currRoot.Right;
+                            currRoot.Left = currRoot.Right.Left;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
+                            compressRope(currRoot.Right);
+                        }
+                        // If the right node has an empty child
+                        else if (currRoot.Right.Right == null)
+                        {
+                            temp = currRoot.Right;
+                            currRoot.Left = null;
                             currRoot.Right = null;
+                            currRoot.Length = temp.Length;
+                            currRoot.Item = temp.Item;
                         }
                     }
                 }
+                if ((currRoot.Right != null && currRoot.Length == currRoot.Right.Length) || (currRoot.Left != null && currRoot.Length == currRoot.Left.Length))
+                    compressRope(currRoot);
             }
         }
 
@@ -966,7 +984,7 @@ public class Rope<T>
             rope2.SplitRope(25);
             Rope<string> rope3 = new Rope<string>(s);
             rope3.SplitRope(35);
-            //rope.Rebalance();
+            rope2.Rebalance();
             Console.WriteLine("Printing the Rebalanced Rope");
             rope.PrintRope();
             Console.Write("Index of first occurrence of ing: ");
