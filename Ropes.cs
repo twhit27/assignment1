@@ -13,6 +13,7 @@ using System.Reflection;
 
 public class Rope<T>
     {
+
         //Node class for Rope
         public class Node<T>
         {
@@ -145,42 +146,42 @@ public class Rope<T>
             return i;
         }
 
-    //CharAt Method
-    //Return the character at index i (3 marks).
-    //Inspired by Brian Patrick's augmented treap rank method
-    public char CharAt(int i)
-    {
-        Node<T> p = root;
-        bool found = false;
-
-        int strIndex = i; //Index of the character within the tree
-
-        //Checking that the index given is less than the root
-        //If the index is not less than the root's length, the character does not exist in the rope
-        if (p.Length-1 < i)
-            return ' ';
-
-        //Move through the tree until the leaf node containing the character is found
-        while (!found)
+        //CharAt Method
+        //Return the character at index i (3 marks).
+        //Inspired by Brian Patrick's augmented treap rank method
+        public char CharAt(int i)
         {
-            //If the index is greater than half of the length of the current node, move right
-            if (p.Length/2 <= strIndex) 
-            {
-                p = p.Right;              
-                strIndex -= p.Length; //Adjust the index to account for moving down the rope
-            }
-            //If not, move down the left
-            else
-                p = p.Left;
-            
-           //Once at the leaf node containing the character, set found to true
-            if (p.Right == null && p.Left == null)
-                found = true;
-            
-        }
+            Node<T> p = root;
+            bool found = false;
 
-        return p.Item[strIndex];     //Return the character at the given index within the string
-    }
+            int strIndex = i; //Index of the character within the tree
+
+            //Checking that the index given is less than the root
+            //If the index is not less than the root's length, the character does not exist in the rope
+            if (p.Length - 1 < i)
+                return ' ';
+
+            //Move through the tree until the leaf node containing the character is found
+            while (!found)
+            {
+                //If the index is greater than half of the length of the current node, move right
+                if (p.Length / 2 <= strIndex)
+                {
+                    p = p.Right;
+                    strIndex -= p.Length; //Adjust the index to account for moving down the rope
+                }
+                //If not, move down the left
+                else
+                    p = p.Left;
+
+                //Once at the leaf node containing the character, set found to true
+                if (p.Right == null && p.Left == null)
+                    found = true;
+
+            }
+
+            return p.Item[strIndex];     //Return the character at the given index within the string
+        }
 
         //IndexOf Method
         //Return the index of the first occurrence of character c (4 marks).
@@ -212,34 +213,34 @@ public class Rope<T>
         }
 
 
-    //Reverse Method
-    //Reverse the string by swapping children recursivley
-    public void Reverse()
-    {
-        Reverse(root);
-    }
-
-    private Node<T> Reverse(Node<T> parent)
-    {
-        Node<T> temp = new Node<T>(parent.Item, parent.Length, parent.Left, parent.Right);
-
-        if (parent.Item != "")
+        //Reverse Method
+        //Reverse the string by swapping children recursivley
+        public void Reverse()
         {
-            //reverse string approach from https://www.educative.io/answers/how-to-reverse-a-string-in-c-sharp
-            char[] sArray = temp.Item.ToCharArray();
-            Array.Reverse(sArray);
-            string reversed = new string(sArray);
-            parent.Item = reversed;
+            Reverse(root);
+        }
+
+        private Node<T> Reverse(Node<T> parent)
+        {
+            Node<T> temp = new Node<T>(parent.Item, parent.Length, parent.Left, parent.Right);
+
+            if (parent.Item != "")
+            {
+                //reverse string approach from https://www.educative.io/answers/how-to-reverse-a-string-in-c-sharp
+                char[] sArray = temp.Item.ToCharArray();
+                Array.Reverse(sArray);
+                string reversed = new string(sArray);
+                parent.Item = reversed;
+                return parent;
+            }
+            else
+            {
+                parent.Left = Reverse(temp.Right);
+                parent.Right = Reverse(temp.Left);
+            }
+
             return parent;
         }
-        else
-        {
-            parent.Left = Reverse(temp.Right);
-            parent.Right = Reverse(temp.Left);
-        }
-
-        return parent;
-    }
 
         //Length Method
         //Return the length of the string (1 mark).
@@ -369,16 +370,16 @@ public class Rope<T>
                 // Rope will be split on the left side of the current node
                 if (i - p.Right.Length < p.Right.Length)
                 {
-                    /* Getting a status update on the variables
+                    // Getting a status update on the variables
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("i - p.Right: ");
                     Console.WriteLine(i - p.Right.Length);
                     Console.Write("p.Right: ");
-                    Console.WriteLine(p.Right.Length);*/
+                    Console.WriteLine(p.Right.Length);
 
                     rightRoot.Left = root.Left;
-                    rightRoot.Right = SplitRopeRight(p.Right, i, 0, new Node<T>("", 0, null, null));
+                    rightRoot.Right = SplitRopeLeft(p.Right, i - 20, 0, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
                     root.Left = null;
                 }
@@ -393,7 +394,7 @@ public class Rope<T>
                     Console.Write("p.Right: ");
                     Console.WriteLine(p.Right.Length);*/
                     rightRoot.Left = root.Left;
-                    rightRoot.Right = SplitRopeRight(p.Right, i, 3, new Node<T>("", 0, null, null));
+                    rightRoot.Right = SplitRopeLeft(p.Right, i - 20, 3, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
                     root.Left = null;
                 }
@@ -454,263 +455,21 @@ public class Rope<T>
             ReassignLength(root);
             compressRope(root);
             return rightRoot;
-            // Method to assist in the split of the string
-            // Traverses the rope to find the node that contains the index
-            Node<T> SplitRopeRight(Node<T> current, int i, int directions, Node<T> currRoot)
-            {
-                // Trying to split the rope on the right side
-                if (current.Length < i)
-                {
-                    // Rope will be split on the left side of the current node
-                    if (i - current.Length < 0 && current.Left != null)
-                    {
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("current.Length - i: ");
-                        Console.WriteLine(current.Length - i);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(0);
-                            currRoot = SplitRopeRight(current.Left, i, directions, currRoot);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(2);
-                            else
-                                currRoot = LinkNewRope(1);
-                            currRoot = SplitRopeRight(current.Left, i, 2, currRoot);
-                        }
-                    }
-                    // rope will be split on the current node
-                    else if (i - current.Length > 0 && current.Right != null)
-                    {
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("i - current.Length: ");
-                        Console.WriteLine(i - current.Length);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(1);
-                            else
-                                currRoot = LinkNewRope(0);
-                            currRoot = SplitRopeRight(current.Right, i - current.Length, 1, currRoot);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(3);
-                            currRoot = SplitRopeRight(current.Right, i - current.Length, directions, currRoot);
-                        }
-                    }
-                    // split will occur in between the right and left side of the current node
-                    else if (i - current.Length == 0)
-                    {
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("i - current.Length: ");
-                        Console.WriteLine(i - current.Length);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(1);
-                            else if (directions == 1)
-                                currRoot = LinkNewRope(0);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(2);
-                            else if (directions == 2)
-                                currRoot = LinkNewRope(1);
-                        }
-                    }
-                    // rope will be split on the current node
-                    else
-                    {
-                        current.Left = Build(current.Item, 0, i);
-                        current.Right = Build(current.Item, i, i - current.Length);
-                        current.Length = current.Left.Length;
-                        current.Item = "";
-                        currRoot = SplitRopeRight(current, i, directions, currRoot);
-                    }
-                }
-                // Trying to split the rope on the left side
-                else if (current.Length > i)
-                {
-                    Console.WriteLine("current.Length > i");
-                    // Rope will be split on the left side of the current node
-                    if (current.Length - i < 0 && current.Left != null)
-                    {
-                        Console.WriteLine("current.Length - i < 0 && current.Left != null");
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("current.Length - i: ");
-                        Console.WriteLine(current.Length - i);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(0);
-                            currRoot = SplitRopeRight(current.Left, i, directions, currRoot);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(2);
-                            else
-                                currRoot = LinkNewRope(1);
-                            currRoot = SplitRopeRight(current.Left, i, 2, currRoot);
-                        }
-                    }
-                    // Rope will be split on the right side of the current node
-                    else if (current.Length - i > 0 && current.Right != null)
-                    {
-                        Console.WriteLine("current.Length - i > 0 && current.Right != null");
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("current.Length - i: ");
-                        Console.WriteLine(current.Length - i);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);
-                        Console.WriteLine(directions);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(1);
-                            else
-                                currRoot = LinkNewRope(0);
-                            currRoot = SplitRopeRight(current.Right, current.Length - i, 1, currRoot);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(3);
-                            currRoot = SplitRopeRight(current.Right, current.Length - i, directions, currRoot);
-                        }
-                    }
-                    // split will occur in between the right and left side of the current node
-                    else if (current.Length - i == 0)
-                    {
-                        Console.WriteLine("current.length - i == 0");
-                        /* Getting a status update on the variables
-                        Console.Write("i: ");
-                        Console.WriteLine(i);
-                        Console.Write("i - current.Length: ");
-                        Console.WriteLine(i - current.Length);
-                        Console.Write("Current.Left: ");
-                        Console.WriteLine(current.Length);*/
-                        if (directions < 2)
-                        {
-                            if (directions == 0)
-                                currRoot = LinkRoot(1);
-                            else if (directions == 1)
-                                currRoot = LinkNewRope(0);
-                        }
-                        else
-                        {
-                            if (directions == 3)
-                                currRoot = LinkRoot(2);
-                            else if (directions == 2)
-                                currRoot = LinkNewRope(1);
-                        }
-                    }
-                    // rope will be split on the current node
-                    else
-                    {
-                        Console.WriteLine("else");
-                        current.Left = Build(current.Item, 0, current.Length - i);
-                        current.Right = Build(current.Item, current.Length - i, current.Length - i);
-                        current.Length = current.Left.Length;
-                        current.Item = "";
-                        currRoot = SplitRopeRight(current, i, directions, currRoot);
-                    }
-                }
-
-                return currRoot;
-                // Supporting method for split rope that links nodes to the proper root
-                Node<T> LinkRoot(int linkLocation)
-                {
-                    // Linking left node to new root
-                    if (linkLocation < 2)
-                    {
-                        currRoot.Left = current.Left;
-                        currRoot.Length = current.Length;
-                        if (linkLocation == 1)
-                            current.Left = null;
-                    }
-                    // Linking right node to new root
-                    else
-                    {
-                        currRoot.Right = current.Right;
-                        currRoot.Length = current.Length;
-                        if (linkLocation == 2)
-                            current.Right = null;
-                    }
-                    return currRoot;
-                }
-                // Linking nodes to new rope
-                Node<T> LinkNewRope(int linkLocation)
-                {
-                    Node<T> newRope = currRoot;
-                    // Link nodes to the right side of the new rope
-                    if (linkLocation == 0)
-                    {
-                        if (newRope.Right == null)
-                            newRope.Right = current.Left;
-                        else
-                        {
-                            while (newRope.Right.Right != null)
-                                newRope = newRope.Right;
-                            newRope.Right = Concatenate(newRope.Right, current.Left);
-                        }
-                        current.Left = null;
-                    }
-                    // Link nodes to the left side of the new rope
-                    else if (linkLocation == 1)
-                    {
-                        if (newRope.Left == null)
-                            newRope.Left = current.Right;
-                        else
-                        {
-                            while (newRope.Left.Left != null)
-                                newRope = newRope.Left;
-                            newRope = Concatenate(current.Right, newRope.Left);
-                        }
-                        current.Right = null;
-                    }
-                    return currRoot;
-                }
-            }
+            
             Node<T> SplitRopeLeft(Node<T> current, int i, int directions, Node<T> currRoot)
             {
-
                 Console.WriteLine("current.Length > i");
                 // Rope will be split on the left side of the current node
-                if (current.Length - i < 0 && current.Left != null)
+                if (current.Length - i > 10 && current.Left != null)
                 {
-                    /* Getting a status update on the variables
-                    Console.WriteLine("i < current.Length: ");
+                    // Getting a status update on the variables
+                    Console.WriteLine("i > current.Length: ");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("current.Length - i: ");
                     Console.WriteLine(current.Length - i);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
+                    Console.WriteLine(current.Length);
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -726,17 +485,19 @@ public class Rope<T>
                         currRoot = SplitRopeLeft(current.Left, i, 2, currRoot);
                     }
                 }
-                // rope will be split on the current node
+                // rope will be split on the left side of the current node
                 else if (current.Length - i > 0 && current.Right != null)
                 {
-                    /* Getting a status update on the variables
-                    Console.WriteLine("i > current.Length");
+                    // Getting a status update on the variables
+                    Console.WriteLine("i < current.Length");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("current.Length - i: ");
                     Console.WriteLine(current.Length - i);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
+                    Console.WriteLine(current.Length);
+                    //Console.WriteLine("Current:");
+                    //PrintRope(current, 0);
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -755,14 +516,14 @@ public class Rope<T>
                 // rope will be split on the current node
                 else if (current.Length - i == 0)
                 {
-                    /* Getting a status update on the variables
+                    // Getting a status update on the variables
                     Console.WriteLine("i == current.Length");
                     Console.Write("i: ");
                     Console.WriteLine(i);
                     Console.Write("i - current.Length: ");
                     Console.WriteLine(i - current.Length);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
+                    Console.WriteLine(current.Length);
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -781,6 +542,9 @@ public class Rope<T>
                 // rope will be split on the current node
                 else
                 {
+                    Console.WriteLine("i == current.Length");
+                    Console.Write("i: ");
+                    Console.WriteLine(i);
                     Console.WriteLine("SplitRope else");
                     current.Left = Build(current.Item, 0, i);
                     current.Right = Build(current.Item, i, current.Length - i);
@@ -848,7 +612,7 @@ public class Rope<T>
         }
 
         // Helper method for the split method to recalculate the lengths of the nodes after the rope is split 
-        private void ReassignLength (Node<T> currRoot)
+        private void ReassignLength(Node<T> currRoot)
         {
             if (currRoot != null)
             {
@@ -894,7 +658,7 @@ public class Rope<T>
 
         // Additional Optimizations 1
         // After a split, compress the path back to the root to ensure that binary tree is full, i.e. each non-leaf node has two non-empty children
-        private void compressRope (Node<T> currRoot)
+        private void compressRope(Node<T> currRoot)
         {
             Node<T> temp = new Node<T>("", 0, null, null);
             if (currRoot != null)
@@ -930,9 +694,9 @@ public class Rope<T>
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
                             // If the node is a leaf node
-                            if (currRoot.Left.Item != "")
+                            if (temp.Item != "")
                             {
-                                currRoot.Item = currRoot.Left.Item;
+                                currRoot.Item = temp.Item;
                                 currRoot.Left = null;
                                 return;
                             }
@@ -972,9 +736,9 @@ public class Rope<T>
                             currRoot.Length = temp.Length;
                             currRoot.Item = temp.Item;
                             // If the right node is a leaf node
-                            if (currRoot.Right.Item != "")
+                            if (temp.Item != "")
                             {
-                                currRoot.Item = currRoot.Right.Item;
+                                currRoot.Item = temp.Item;
                                 currRoot.Right = null;
                                 return;
                             }
@@ -987,164 +751,165 @@ public class Rope<T>
         }
 
 
-    //Rebalance Method
-    //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
-    //Note: Will be switched to private once done testing
-    public Node<T> Rebalance()
-    {
-        List<int> fibSeq = new List<int> {1, 2};
-        Node<T>[] minLength;
-        Node<T> branch1 = new Node<T>("", 0, null, null);
-        Node<T> branch2 = new Node<T>("", 0, null, null);
 
-        //Building the fibonnaci sequence up until the total length of the rope
-        for (int i =1; fibSeq[i] <= root.Length; i++)
+        //Rebalance Method
+        //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
+        //Note: Will be switched to private once done testing
+        public Node<T> Rebalance()
         {
-            fibSeq.Add(fibSeq[i] + fibSeq[i - 1]);
-        }
+            List<int> fibSeq = new List<int> { 1, 2 };
+            Node<T>[] minLength;
+            Node<T> branch1 = new Node<T>("", 0, null, null);
+            Node<T> branch2 = new Node<T>("", 0, null, null);
 
-        // Reversing the list to match the paper's implementation better
-        fibSeq.Reverse();
+            //Building the fibonnaci sequence up until the total length of the rope
+            for (int i = 1; fibSeq[i] <= root.Length; i++)
+            {
+                fibSeq.Add(fibSeq[i] + fibSeq[i - 1]);
+            }
 
-        minLength = new Node<T>[fibSeq.Count]; //Creating an array of nodes the size of the sequence to store nodes in
+            // Reversing the list to match the paper's implementation better
+            fibSeq.Reverse();
 
-        //If the root node has no children, the tree is balanced
-        if ((root.Left == null) && (root.Right == null))
-        {
-            Console.WriteLine("Rope is balanced");
+            minLength = new Node<T>[fibSeq.Count]; //Creating an array of nodes the size of the sequence to store nodes in
+
+            //If the root node has no children, the tree is balanced
+            if ((root.Left == null) && (root.Right == null))
+            {
+                Console.WriteLine("Rope is balanced");
+                return root;
+            }
+
+            //Move through the tree until you get through all the leaves, starting on the left
+            if (root.Left != null)
+            {
+                Rebalance(root.Left, fibSeq, minLength);
+            }
+
+            if (root.Right != null)
+            {
+                Rebalance(root.Right, fibSeq, minLength);
+            }
+
+            //Once you've finished adding all the nodes to minLength, concatenate them all together into one tree
+            //There should only be two nodes to concatenate together
+            for (int n = 0; n <= minLength.Length - 1; n++)
+            {
+                //Getting the first/largest branch in minLength
+                if (branch1.Length == 0 && minLength[n] != null)
+                {
+                    branch1 = minLength[n];
+                }
+
+                //Getting the second/smaller in minLength
+                else if (branch2.Length == 0 && minLength[n] != null)
+                {
+                    //Checking that the node there is a balance rope
+                    if (minLength[n].Right != null && minLength[n].Left != null)
+                    {
+                        branch2 = minLength[n];
+                    }
+
+                    //If it's not, split it into two seperate strings
+                    else
+                    {
+                        int strLength = minLength[n].Length;
+                        int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
+
+                        //Getting the first and second strings
+                        string firstString = minLength[n].Item.Substring(0, middle);
+                        string secondString = minLength[n].Item.Substring(middle);
+
+                        //Making the nodes
+                        Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
+                        Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
+
+                        branch2 = Concatenate(node1, node2);
+
+                    }
+                }
+            }
+
+            root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
             return root;
         }
 
-        //Move through the tree until you get through all the leaves, starting on the left
-        if (root.Left != null)
+        //Rebalance II
+        //Calls itself recursively to move through the tree
+        private void Rebalance(Node<T> curr, List<int> fibSeq, Node<T>[] minLength)
         {
-            Rebalance(root.Left, fibSeq, minLength);
-        }
+            bool added = false;
+            Node<T> conNode;
 
-        if (root.Right != null)
-        {
-            Rebalance(root.Right, fibSeq, minLength);
-        }
-
-        //Once you've finished adding all the nodes to minLength, concatenate them all together into one tree
-        //There should only be two nodes to concatenate together
-        for (int n = 0; n <= minLength.Length-1; n++)
-        {
-            //Getting the first/largest branch in minLength
-            if (branch1.Length == 0 && minLength[n] != null)
+            //If the node is a leaf node, insert the node into the appropriate position
+            if (curr.Left == null && curr.Right == null)
             {
-                branch1 = minLength[n];
-            }
-
-            //Getting the second/smaller in minLength
-            else if (branch2.Length == 0 && minLength[n] != null)
-            {
-                //Checking that the node there is a balance rope
-                if (minLength[n].Right != null && minLength[n].Left != null)
+                //Moving through the array until the length of the string fits in the interval
+                for (int i = 0; curr.Length < fibSeq[i]; i++)
                 {
-                    branch2 = minLength[n];
-                }
-
-                //If it's not, split it into two seperate strings
-                else
-                {
-                    int strLength = minLength[n].Length;
-                    int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
-
-                    //Getting the first and second strings
-                    string firstString = minLength[n].Item.Substring(0, middle);
-                    string secondString = minLength[n].Item.Substring(middle);
-
-                    //Making the nodes
-                    Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
-                    Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
-
-                    branch2 = Concatenate(node1, node2);
-
-                }
-            }
-        }
-
-        root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
-        return root;
-    }
-
-    //Rebalance II
-    //Calls itself recursively to move through the tree
-    private void Rebalance(Node<T> curr, List<int> fibSeq, Node<T>[] minLength)
-    {
-        bool added = false;
-        Node<T> conNode;
-
-        //If the node is a leaf node, insert the node into the appropriate position
-        if (curr.Left == null && curr.Right == null)
-        {
-            //Moving through the array until the length of the string fits in the interval
-            for(int i = 0; curr.Length < fibSeq[i]; i++)
-            {
-                if (curr.Length < fibSeq[i] && curr.Length >= fibSeq[i+1])
-                {
-                    //Checking to see if that position in the minLength array is empty
-                    if (minLength[i+1] == null)
+                    if (curr.Length < fibSeq[i] && curr.Length >= fibSeq[i + 1])
                     {
-                        for(int j = i+2; fibSeq.Count > j; j++)
+                        //Checking to see if that position in the minLength array is empty
+                        if (minLength[i + 1] == null)
                         {
-                            //If there is a node in the smaller numbers of the fibonnaci sequence, concatenate the two nodes together
-                            if (minLength[j] != null)
+                            for (int j = i + 2; fibSeq.Count > j; j++)
                             {
-                                conNode = Concatenate(minLength[j], curr);
-                                minLength[j] = null; //Set it to null after moving it
+                                //If there is a node in the smaller numbers of the fibonnaci sequence, concatenate the two nodes together
+                                if (minLength[j] != null)
+                                {
+                                    conNode = Concatenate(minLength[j], curr);
+                                    minLength[j] = null; //Set it to null after moving it
 
-                                //If the concatenation causes the length to increase over the interval, put in the correct position
-                                if (fibSeq[i] <= conNode.Length && fibSeq[i-1] > conNode.Length)
-                                {
-                                    minLength[i] = conNode;
-                                    added = true;
-                                }
-                                //If not, put it in the orignal spot
-                                else
-                                {
-                                    minLength[i+1] = conNode;
-                                    added = true;
+                                    //If the concatenation causes the length to increase over the interval, put in the correct position
+                                    if (fibSeq[i] <= conNode.Length && fibSeq[i - 1] > conNode.Length)
+                                    {
+                                        minLength[i] = conNode;
+                                        added = true;
+                                    }
+                                    //If not, put it in the orignal spot
+                                    else
+                                    {
+                                        minLength[i + 1] = conNode;
+                                        added = true;
+                                    }
                                 }
                             }
-                        }
 
-                        //If not, directly add the node to minLength
-                        if (added == false)
-                        {
-                            minLength[i + 1] = curr;
+                            //If not, directly add the node to minLength
+                            if (added == false)
+                            {
+                                minLength[i + 1] = curr;
+                            }
+
+
                         }
- 
-                        
-                    }
-                    //If that position is not empty, concatenate the two nodes and call rebalance again to find the proper position
-                    else
-                    {
-                        Rebalance(Concatenate(curr, minLength[i+1]), fibSeq, minLength);
+                        //If that position is not empty, concatenate the two nodes and call rebalance again to find the proper position
+                        else
+                        {
+                            Rebalance(Concatenate(curr, minLength[i + 1]), fibSeq, minLength);
+                        }
                     }
                 }
+
+
             }
-         
+
+            //If the node is not a leaf node, keep going down
+            if (curr.Left != null)
+            {
+                Rebalance(curr.Left, fibSeq, minLength);
+            }
+
+            //Once done going down the left, go down the right
+            if (curr.Right != null)
+            {
+                Rebalance(curr.Right, fibSeq, minLength);
+            }
 
         }
 
-        //If the node is not a leaf node, keep going down
-        if (curr.Left != null)
-        {
-            Rebalance(curr.Left, fibSeq, minLength);
-        }
-        
-        //Once done going down the left, go down the right
-        if (curr.Right != null)
-        {
-            Rebalance(curr.Right, fibSeq, minLength);
-        }
 
     }
-
-
-}
 
 
     // NOTES 
@@ -1194,8 +959,14 @@ public class Rope<T>
             Console.WriteLine(rope.ToString());
             Console.WriteLine();
             Console.WriteLine("Spliting the Rope");
-            rope.SplitRope(15);
-            rope.Rebalance();
+            rope.SplitRope(5);
+            Rope<string> rope1 = new Rope<string>(s);
+            rope1.SplitRope(15);
+            Rope<string> rope2 = new Rope<string>(s);
+            rope2.SplitRope(25);
+            Rope<string> rope3 = new Rope<string>(s);
+            rope3.SplitRope(35);
+            //rope.Rebalance();
             Console.WriteLine("Printing the Rebalanced Rope");
             rope.PrintRope();
             Console.Write("Index of first occurrence of ing: ");
