@@ -74,14 +74,15 @@ public class Rope<T>
         //Insert string S at index i (5 marks).
         public void Insert(string S, int i)
         {
-
+            
         }
 
         //Delete Method
         //Delete the substring S[i, j] (5 marks).
         public void Delete(int i, int j)
         {
-
+            
+            
         }
 
         //Substring Method
@@ -274,7 +275,8 @@ public class Rope<T>
         //Print the augmented binary tree of the current rope (4 marks).
         public void PrintRope()
         {
-            if (root != null){
+            if (root != null)
+            {
                 //If the rope only has one node in it, only print out the content for that node
                 if (root.Left == null && root.Right == null)
                 {
@@ -284,9 +286,9 @@ public class Rope<T>
                 {
                     PrintRope(root, 0); //Calls the private print rope method, giving the root of the rope
                 }
-        }
+            }
 
-        
+
         }
 
         // Private PrintRope
@@ -422,11 +424,11 @@ public class Rope<T>
             // Trying to split the rope on the left side of the root
             else if (i < p.Left.Length)
             {
-                Console.WriteLine("i < p.Left.Length");
+                //Console.WriteLine("i < p.Left.Length");
                 // Rope will be split on the left side of the current node
                 if (p.Left.Length - i < p.Left.Length)
                 {
-                    Console.WriteLine("p.Left.Length - i < p.Left.Length");
+                    //Console.WriteLine("p.Left.Length - i < p.Left.Length");
                     /* Getting a status update on the variables
                     Console.Write("i: ");
                     Console.WriteLine(i);
@@ -440,7 +442,7 @@ public class Rope<T>
                 // rope will be split on the right side of the current node
                 else if (i - p.Left.Length > p.Left.Length)
                 {
-                    Console.WriteLine("i - p.Left.Length > p.Left.Length");
+                    //Console.WriteLine("i - p.Left.Length > p.Left.Length");
                     /* Getting a status update on the variables
                     Console.Write("i: ");
                     Console.WriteLine(i);
@@ -466,10 +468,10 @@ public class Rope<T>
             ReassignLength(root);
             compressRope(root);
             return rightRoot;
-            
+
             Node<T> SplitRope(Node<T> current, int i, int directions, Node<T> currRoot)
             {
-                Console.WriteLine("current.Length > i");
+                //Console.WriteLine("current.Length > i");
                 // Rope will be split on the left side of the current node
                 if (current.Length - i > MAX_LENGTH && current.Left != null)
                 {
@@ -515,13 +517,13 @@ public class Rope<T>
                             currRoot = LinkRoot(1);
                         else
                             currRoot = LinkNewRope(0);
-                        currRoot = SplitRope(current.Right, current.Length - i, 1, currRoot);
+                        currRoot = SplitRope(current.Right, i - MAX_LENGTH, 1, currRoot);
                     }
                     else
                     {
                         if (directions == 3)
                             currRoot = LinkRoot(3);
-                        currRoot = SplitRope(current.Right, current.Length - i, directions, currRoot);
+                        currRoot = SplitRope(current.Right, i - MAX_LENGTH, directions, currRoot);
                     }
                 }
                 // rope will be split on the current node
@@ -671,6 +673,7 @@ public class Rope<T>
         // After a split, compress the path back to the root to ensure that binary tree is full, i.e. each non-leaf node has two non-empty children
         private void compressRope(Node<T> currRoot)
         {
+            
             Node<T> temp = new Node<T>("", 0, null, null);
             if (currRoot != null)
             {
@@ -678,6 +681,7 @@ public class Rope<T>
                 // If there is a node on the left
                 if (currRoot.Left != null)
                 {
+                    Console.WriteLine(currRoot.Left.Left == null);
                     // If there is a node on the right
                     if (currRoot.Right != null)
                     {
@@ -687,8 +691,9 @@ public class Rope<T>
                     // If the right node is empty
                     else
                     {
+                        Console.WriteLine("Hi_0");
                         // If the left node has two non-empty chidlren
-                        if (currRoot.Left.Left != null && currRoot.Left.Right != null)
+                        if (currRoot.Left.Left != null && currRoot.Left.Left.Length != 0 && currRoot.Left.Right != null && currRoot.Left.Right.Length != 0)
                         {
                             temp = currRoot.Left;
                             currRoot.Right = currRoot.Left.Right;
@@ -698,7 +703,7 @@ public class Rope<T>
                             compressRope(currRoot.Right);
                             compressRope(currRoot.Left);
                         }
-                        else if (currRoot.Left.Left != null)
+                        else if (currRoot.Left.Left != null && currRoot.Left.Left.Length != 0)
                         {
                             temp = currRoot.Left;
                             currRoot.Left = currRoot.Left.Left;
@@ -706,7 +711,7 @@ public class Rope<T>
                             currRoot.Item = temp.Item;
                             compressRope(currRoot.Left);
                         }
-                        else if(currRoot.Left.Right != null)
+                        else if (currRoot.Left.Right != null && currRoot.Left.Right.Length != 0)
                         {
                             temp = currRoot.Left;
                             currRoot.Right = currRoot.Left.Right;
@@ -717,6 +722,7 @@ public class Rope<T>
                         // If the left node has an empty child
                         else if (currRoot.Left.Left == null)
                         {
+                            Console.WriteLine("Hi_1");
                             temp = currRoot.Left;
                             currRoot.Left = null;
                             currRoot.Right = null;
@@ -738,7 +744,7 @@ public class Rope<T>
                     else
                     {
                         // If the right node has two non-empty children
-                        if (currRoot.Right.Right != null && currRoot.Right.Left != null)
+                        if (currRoot.Right.Right != null && currRoot.Right.Right.Length != 0 && currRoot.Right.Left != null && currRoot.Right.Left.Length != 0)
                         {
                             temp = currRoot.Right;
                             currRoot.Left = currRoot.Right.Left;
@@ -748,7 +754,7 @@ public class Rope<T>
                             compressRope(currRoot.Right);
                             compressRope(currRoot.Left);
                         }
-                        else if (currRoot.Right.Right != null)
+                        else if (currRoot.Right.Right != null && currRoot.Right.Right.Length != 0)
                         {
                             temp = currRoot.Right;
                             currRoot.Right = currRoot.Right.Right;
@@ -756,7 +762,7 @@ public class Rope<T>
                             currRoot.Item = temp.Item;
                             compressRope(currRoot.Right);
                         }
-                        else if (currRoot.Right.Left != null)
+                        else if (currRoot.Right.Left != null && currRoot.Right.Left.Length != 0)
                         {
                             temp = currRoot.Right;
                             currRoot.Left = currRoot.Right.Left;
@@ -785,200 +791,200 @@ public class Rope<T>
         //Rebalance Method
         //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
         //Note: Will be switched to private once done testing
-    public Node<T> Rebalance()
-    {
-        List<int> fibSeq = new List<int> {1, 2};
-        Node<T>[] minLength;
-        Node<T> branch1 = new Node<T>("", 0, null, null);
-
-        //Building the fibonnaci sequence up until the total length of the rope
-        for (int i =1; fibSeq[i] <= root.Length; i++)
+        public Node<T> Rebalance()
         {
-            fibSeq.Add(fibSeq[i] + fibSeq[i - 1]);
-        }
+            List<int> fibSeq = new List<int> { 1, 2 };
+            Node<T>[] minLength;
+            Node<T> branch1 = new Node<T>("", 0, null, null);
 
-        // Reversing the list to match the paper's implementation better
-        fibSeq.Reverse();
+            //Building the fibonnaci sequence up until the total length of the rope
+            for (int i = 1; fibSeq[i] <= root.Length; i++)
+            {
+                fibSeq.Add(fibSeq[i] + fibSeq[i - 1]);
+            }
 
-        minLength = new Node<T>[fibSeq.Count]; //Creating an array of nodes the size of the sequence to store nodes in
+            // Reversing the list to match the paper's implementation better
+            fibSeq.Reverse();
 
-        //If the root node has no children, the tree is balanced
-        if ((root.Left == null) && (root.Right == null))
-        {
+            minLength = new Node<T>[fibSeq.Count]; //Creating an array of nodes the size of the sequence to store nodes in
+
+            //If the root node has no children, the tree is balanced
+            if ((root.Left == null) && (root.Right == null))
+            {
+                return root;
+            }
+
+
+
+            //Move through the tree until you get through all the leaves, starting on the left
+            if (root.Left != null)
+            {
+                Rebalance(root.Left, fibSeq, minLength);
+            }
+
+            if (root.Right != null)
+            {
+                Rebalance(root.Right, fibSeq, minLength);
+            }
+
+            //Once you've finished adding all the nodes to minLength, concatenate them all together into one tree
+
+            for (int n = 0; n < minLength.Length; n++)
+            {
+                if (minLength[n] != null)
+                {
+                    if (minLength[n].Right == null && minLength[n].Left == null)
+                    {
+                        int strLength = minLength[n].Length;
+                        int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
+
+                        //Getting the first and second strings
+                        string firstString = minLength[n].Item.Substring(0, middle);
+                        string secondString = minLength[n].Item.Substring(middle);
+
+                        //Making the nodes
+                        Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
+                        Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
+
+                        minLength[n] = Concatenate(node1, node2);
+                    }
+                }
+
+                //If a rope is found in minLength, save it
+                if (minLength[n] != null && branch1.Length == 0)
+                {
+                    branch1 = minLength[n];
+                }
+
+                //If another rope is found in minLength, concatenate with the previously saved rope
+                else if (minLength[n] != null && branch1.Length != 0)
+                {
+                    branch1 = Concatenate(branch1, minLength[n]);
+                }
+
+            }
+
+            //root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
+
+            root = branch1;
             return root;
         }
 
-
-
-        //Move through the tree until you get through all the leaves, starting on the left
-        if (root.Left != null)
+        //Rebalance II
+        //Calls itself recursively to move through the tree
+        private void Rebalance(Node<T> curr, List<int> fibSeq, Node<T>[] minLength)
         {
-            Rebalance(root.Left, fibSeq, minLength);
-        }
+            bool added = false, altCase = false;
+            Node<T> conNode;
 
-        if (root.Right != null)
-        {
-            Rebalance(root.Right, fibSeq, minLength);
-        }
-
-        //Once you've finished adding all the nodes to minLength, concatenate them all together into one tree
-
-        for (int n = 0; n < minLength.Length; n++)
-        {
-            if (minLength[n] != null)
+            //If the node is a leaf node, insert the node into the appropriate position
+            if (curr.Left == null && curr.Right == null)
             {
-                if (minLength[n].Right == null && minLength[n].Left == null)
+                //Moving through the array until the length of the string fits in the interval
+                for (int i = 0; curr.Length < fibSeq[i]; i++)
                 {
-                    int strLength = minLength[n].Length;
-                    int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
-
-                    //Getting the first and second strings
-                    string firstString = minLength[n].Item.Substring(0, middle);
-                    string secondString = minLength[n].Item.Substring(middle);
-
-                    //Making the nodes
-                    Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
-                    Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
-
-                    minLength[n] = Concatenate(node1, node2);
-                }
-            }
-
-            //If a rope is found in minLength, save it
-            if (minLength[n] != null && branch1.Length == 0)
-            {
-                branch1 = minLength[n];
-            }
-
-            //If another rope is found in minLength, concatenate with the previously saved rope
-            else if (minLength[n] != null && branch1.Length != 0)
-            {
-                branch1 = Concatenate(branch1, minLength[n]);
-            }
-
-        }
-
-        //root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
-
-        root = branch1;
-        return root;
-    }
-
-    //Rebalance II
-    //Calls itself recursively to move through the tree
-    private void Rebalance(Node<T> curr, List<int> fibSeq, Node<T>[] minLength)
-    {
-        bool added = false, altCase = false;
-        Node<T> conNode;
-
-        //If the node is a leaf node, insert the node into the appropriate position
-        if (curr.Left == null && curr.Right == null)
-        {
-            //Moving through the array until the length of the string fits in the interval
-            for(int i = 0; curr.Length < fibSeq[i]; i++)
-            {
-                if (curr.Length < fibSeq[i] && curr.Length >= fibSeq[i+1] && added == false)
-                {
-                    //Checking to see if that position in the minLength array is empty
-                    if (minLength[i+1] == null)
+                    if (curr.Length < fibSeq[i] && curr.Length >= fibSeq[i + 1] && added == false)
                     {
-                        for(int j = i+2; fibSeq.Count > j; j++)
+                        //Checking to see if that position in the minLength array is empty
+                        if (minLength[i + 1] == null)
                         {
-                            //If there is a node in the smaller numbers of the fibonnaci sequence, concatenate the two nodes together
-                            if (minLength[j] != null)
+                            for (int j = i + 2; fibSeq.Count > j; j++)
                             {
-                                conNode = Concatenate(minLength[j], curr);
-                                minLength[j] = null; //Set it to null after moving it
+                                //If there is a node in the smaller numbers of the fibonnaci sequence, concatenate the two nodes together
+                                if (minLength[j] != null)
+                                {
+                                    conNode = Concatenate(minLength[j], curr);
+                                    minLength[j] = null; //Set it to null after moving it
 
-                                //If the concatenation causes the length to increase over the interval, put in the correct position
-                                if (fibSeq[i] <= conNode.Length && fibSeq[i-1] > conNode.Length)
-                                {
-                                    minLength[i] = conNode;
-                                    added = true;
-                                }
-                                //If not, put it in the orignal spot
-                                else
-                                {
-                                    minLength[i+1] = conNode;
-                                    added = true;
+                                    //If the concatenation causes the length to increase over the interval, put in the correct position
+                                    if (fibSeq[i] <= conNode.Length && fibSeq[i - 1] > conNode.Length)
+                                    {
+                                        minLength[i] = conNode;
+                                        added = true;
+                                    }
+                                    //If not, put it in the orignal spot
+                                    else
+                                    {
+                                        minLength[i + 1] = conNode;
+                                        added = true;
+                                    }
                                 }
                             }
-                        }
 
-                        //If not, directly add the node to minLength
-                        if (added == false)
-                        {
-                            minLength[i + 1] = curr;
-                            added = true;
-                        }
- 
-                        
-                    }
-                    //If that position is not empty, concatenate the two nodes and call rebalance again to find the proper position
-                    else
-                    {
-                        //If the sum of the lengths is smaller than the max length, concatenate the two strings into one node
-                        if(curr.Length + minLength[i+1].Length <= 10)
-                        {
-                            curr.Length = curr.Length + minLength[i + 1].Length;
-                            curr.Item = String.Concat(minLength[i + 1].Item, curr.Item);
-                            minLength[i + 1] = null;
-                            i = -1; //Move back to the start of the sequence to find the correct position
-                        }
+                            //If not, directly add the node to minLength
+                            if (added == false)
+                            {
+                                minLength[i + 1] = curr;
+                                added = true;
+                            }
 
-                        //If concatenating two nodes, make sure the other node is not a leaf node
-                        //If it is, split it into two
+
+                        }
+                        //If that position is not empty, concatenate the two nodes and call rebalance again to find the proper position
                         else
                         {
-                            //Only split if one of the nodes is a leaf node, and the other node is not a leaf node
-                            if (curr.Right == null && curr.Left == null && minLength[i+1].Left != null && minLength[i+1].Right != null)
+                            //If the sum of the lengths is smaller than the max length, concatenate the two strings into one node
+                            if (curr.Length + minLength[i + 1].Length <= 10)
                             {
-                                int strLength = curr.Length;
-                                int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
-                            
-                                //Getting the first and second strings
-                                string firstString = curr.Item.Substring(0, middle);
-                                string secondString = curr.Item.Substring(middle);
+                                curr.Length = curr.Length + minLength[i + 1].Length;
+                                curr.Item = String.Concat(minLength[i + 1].Item, curr.Item);
+                                minLength[i + 1] = null;
+                                i = -1; //Move back to the start of the sequence to find the correct position
+                            }
 
-                                //Making the nodes
-                                Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
-                                Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
+                            //If concatenating two nodes, make sure the other node is not a leaf node
+                            //If it is, split it into two
+                            else
+                            {
+                                //Only split if one of the nodes is a leaf node, and the other node is not a leaf node
+                                if (curr.Right == null && curr.Left == null && minLength[i + 1].Left != null && minLength[i + 1].Right != null)
+                                {
+                                    int strLength = curr.Length;
+                                    int middle = Convert.ToInt32(Math.Floor(strLength / 2.0));
 
-                                curr = Concatenate(node1, node2);
+                                    //Getting the first and second strings
+                                    string firstString = curr.Item.Substring(0, middle);
+                                    string secondString = curr.Item.Substring(middle);
+
+                                    //Making the nodes
+                                    Node<T> node1 = new Node<T>(firstString, firstString.Length, null, null);
+                                    Node<T> node2 = new Node<T>(secondString, secondString.Length, null, null);
+
+                                    curr = Concatenate(node1, node2);
+                                }
+
+
+                                curr = Concatenate(minLength[i + 1], curr);
+                                minLength[i + 1] = null;
+                                i = -1; //Move back to the start of the sequence to find the correct position
+                                altCase = true; //Added logic to ensure the program returns back to the main rope
                             }
 
 
-                            curr = Concatenate(minLength[i + 1], curr);
-                            minLength[i + 1] = null;
-                            i = -1; //Move back to the start of the sequence to find the correct position
-                            altCase = true; //Added logic to ensure the program returns back to the main rope
+
                         }
-             
-
-
                     }
                 }
+
+
             }
-         
+
+            //If the node is not a leaf node, keep going down
+            if (curr.Left != null && altCase != true)
+            {
+                Rebalance(curr.Left, fibSeq, minLength);
+            }
+
+            //Once done going down the left, go down the right
+            if (curr.Right != null && altCase != true)
+            {
+                Rebalance(curr.Right, fibSeq, minLength);
+            }
 
         }
 
-        //If the node is not a leaf node, keep going down
-        if (curr.Left != null && altCase != true)
-        {
-            Rebalance(curr.Left, fibSeq, minLength);
-        }
-        
-        //Once done going down the left, go down the right
-        if (curr.Right != null && altCase != true)
-        {
-            Rebalance(curr.Right, fibSeq, minLength);
-        }
 
     }
-
-
-}
 
 
     // NOTES 
@@ -1028,13 +1034,8 @@ public class Rope<T>
             Console.WriteLine(rope.ToString());
             Console.WriteLine();
             Console.WriteLine("Spliting the Rope");
-            rope.SplitRope(5);
-            Rope<string> rope1 = new Rope<string>(s);
-            rope1.SplitRope(15);
+            rope.SplitRope(19);
             Rope<string> rope2 = new Rope<string>(s);
-            rope2.SplitRope(25);
-            Rope<string> rope3 = new Rope<string>(s);
-            rope3.SplitRope(35);
             rope2.Rebalance();
             Console.WriteLine("Printing the Rebalanced Rope");
             rope.PrintRope();
