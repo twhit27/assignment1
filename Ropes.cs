@@ -75,7 +75,38 @@ public class Rope<T>
         //Insert string S at index i (5 marks).
         public void Insert(string S, int i)
         {
-            
+            int size = root.Left.Length;
+            Node<T> temp = new Node<T>("", 0, null, null);
+            Node<T> splitTemp = new Node<T>("", 0, null, null);
+            Rope<T> R1 = new Rope<T>(S);
+            if (i > root.Length)
+                Console.WriteLine("This string cannot be added since you are trying to add it past the end of the other string.");
+            else if (i == 0)
+                root = Concatenate(R1.root, root);
+            else if (i == root.Length)
+                root = Concatenate(root, R1.root);
+            else
+            {
+                splitTemp = Split(root, i);
+                Console.WriteLine();
+                Console.WriteLine("Printing splitTemp");
+                PrintRope(splitTemp, 0);
+                Console.WriteLine();
+                Console.WriteLine("Printing root");
+                PrintRope(root, 0);
+                if (i < size)
+                {
+                    temp = Concatenate(splitTemp, R1.root);
+                    temp.Length = splitTemp.Length + R1.root.Length;
+                    root = Concatenate(temp, root);
+                }
+                else if (i >= size)
+                {
+                    temp = Concatenate(splitTemp, R1.root);
+                    temp.Length = splitTemp.Length + R1.root.Length;
+                    root = Concatenate(temp, root);
+                }
+            }
         }
 
         //Delete Method
@@ -92,8 +123,8 @@ public class Rope<T>
         {
             String subString = ""; //Declaring an empty string to build the substring in
             int subLength = j - i + 1; //Calculating the resulting length of the substring
-    
-    
+
+
             //Checking if indices are valid
             //If they are not, print an error message and return an empty string
             if (i < 0 || i >= root.Length || j < i || j >= root.Length)
@@ -101,17 +132,17 @@ public class Rope<T>
                 Console.WriteLine("Invalid indices, substring could not be found.");
                 return "";
             }
-    
+
             subString = Substring(i, j, subLength, root, subString);
             Console.WriteLine("The substring was successfully found!");
             return subString;
         }
-    
+
         //Private Substring Method
         //Used to traverse the rope and concatenate the strings at each node according to the given indices
         private string Substring(int i, int j, int subLength, Node<T> curr, string subString)
         {
-    
+
             //If a leaf node has not been reached yet, traverse
             if (curr.Left != null && curr.Right != null)
             {
@@ -120,8 +151,8 @@ public class Rope<T>
                 {
                     subString = Substring(i, j, subLength, curr.Left, subString);
                 }
-    
-    
+
+
                 //If the index is greater than the length of the left side, go right
                 else
                 {
@@ -129,7 +160,7 @@ public class Rope<T>
                     subString = Substring(i, j, subLength, curr.Right, subString);
                 }
             }
-    
+
             //Once the string is found, start concatenating and return the substring created so far
             else
             {
@@ -138,28 +169,28 @@ public class Rope<T>
                     subString = String.Concat(subString, curr.Item[i]);
                     i++;
                 }
-    
+
                 return subString;
             }
-    
+
             //If there are still nodes left to explore, keep going
             if (subString.Length < subLength && curr.Right != null)
             {
                 //Evaluating the updated value of i depending on how close it is to the end (j)
                 if (i + subString.Length < j)
                 {
-                    i = j - subLength + 1  + subString.Length;
+                    i = j - subLength + 1 + subString.Length;
                 }
                 else
                 {
                     i = j;
                 }
-                
+
                 subString = Substring(i, j, subLength, root, subString);
             }
-    
+
             return subString;
-    
+
         }
 
         //Find Method
@@ -211,12 +242,13 @@ public class Rope<T>
                         Find(current.Right, ref s);
                 }
             }
-            if (!found){
-                Console.WriteLine("The substring at the given index was not found.");   
+            if (!found)
+            {
+                Console.WriteLine("The substring at the given index was not found.");
                 i = -1;
             }
-                
-            Console.WriteLine("The substring at the given index was found!");    
+
+            Console.WriteLine("The substring at the given index was found!");
             return i;
         }
 
@@ -227,35 +259,35 @@ public class Rope<T>
         {
             Node<T> p = root;
             bool found = false;
-    
+
             int strIndex = i; //Index of the character within the tree
-    
+
             //Checking that the index given is less than the root
             //If the index is not less than the root's length, the character does not exist in the rope
-            if (p.Length-1 < i)
+            if (p.Length - 1 < i)
             {
                 Console.WriteLine("The index does not exist in the rope.");
                 return ' ';
             }
-                
-    
+
+
             //Move through the tree until the leaf node containing the character is found
             while (!found)
             {
                 //Once at the leaf node containing the character, set found to true
                 if (p.Right == null && p.Left == null)
                     found = true;
-    
+
                 //If the index is greater than half of the length of the current node, move right
-                else if (p.Length/2 <= strIndex) 
+                else if (p.Length / 2 <= strIndex)
                 {
-                    p = p.Right;              
+                    p = p.Right;
                     strIndex -= p.Length; //Adjust the index to account for moving down the rope
                 }
                 //If not, move down the left
                 else
                     p = p.Left;
-        
+
             }
             Console.WriteLine("The character was successfully found!");
             return p.Item[strIndex]; //Return the character at the given index     
@@ -297,7 +329,7 @@ public class Rope<T>
         public void Reverse()
         {
             Reverse(root);
-            Console.WriteLine("The rope was successfully reveresed!"); 
+            Console.WriteLine("The rope was successfully reveresed!");
         }
 
         private Node<T> Reverse(Node<T> parent)
@@ -455,8 +487,9 @@ public class Rope<T>
             Console.Write("Root.Left: ");
             Console.WriteLine(root.Left.Length);*/
             Node<T> rightRoot = new Node<T>("", 0, null, null);
-            if (i > p.Length)
+            if (i > p.Length || i == 0)
                 Console.WriteLine("The rope cannot be split at this location");
+                
             // Trying to split the rope on the right side of the root
             else if (i > p.Left.Length)
             {
@@ -553,7 +586,7 @@ public class Rope<T>
             {
                 //Console.WriteLine("current.Length > i");
                 // Rope will be split on the left side of the current node
-                if (current.Length - i > MAX_LENGTH && current.Left != null)
+                if (current.Left != null && current.Length - i > current.Left.Length)
                 {
                     /* Getting a status update on the variables
                     Console.WriteLine("i > current.Length: ");
@@ -588,7 +621,9 @@ public class Rope<T>
                     Console.Write("current.Length - i: ");
                     Console.WriteLine(current.Length - i);
                     Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
+                    Console.WriteLine(current.Length);
+                    Console.WriteLine("i - MAX_LENGTH");
+                    Console.WriteLine(i - MAX_LENGTH);*/
                     //Console.WriteLine("Current:");
                     //PrintRope(current, 0);
                     if (directions < 2)
@@ -753,7 +788,7 @@ public class Rope<T>
         // After a split, compress the path back to the root to ensure that binary tree is full, i.e. each non-leaf node has two non-empty children
         private void compressRope(Node<T> currRoot)
         {
-            
+
             Node<T> temp = new Node<T>("", 0, null, null);
             if (currRoot != null)
             {
@@ -761,7 +796,6 @@ public class Rope<T>
                 // If there is a node on the left
                 if (currRoot.Left != null)
                 {
-                    Console.WriteLine(currRoot.Left.Left == null);
                     // If there is a node on the right
                     if (currRoot.Right != null)
                     {
@@ -771,7 +805,6 @@ public class Rope<T>
                     // If the right node is empty
                     else
                     {
-                        Console.WriteLine("Hi_0");
                         // If the left node has two non-empty chidlren
                         if (currRoot.Left.Left != null && currRoot.Left.Left.Length != 0 && currRoot.Left.Right != null && currRoot.Left.Right.Length != 0)
                         {
@@ -802,7 +835,6 @@ public class Rope<T>
                         // If the left node has an empty child
                         else if (currRoot.Left.Left == null)
                         {
-                            Console.WriteLine("Hi_1");
                             temp = currRoot.Left;
                             currRoot.Left = null;
                             currRoot.Right = null;
@@ -1112,11 +1144,33 @@ public class Rope<T>
             Console.WriteLine(rope.CharAt(3));
             Console.WriteLine("Printing Rope as a String");
             Console.WriteLine(rope.ToString());
+            
             Console.WriteLine();
-            Console.WriteLine("Spliting the Rope");
-            rope.SplitRope(19);
-            Rope<string> rope2 = new Rope<string>(s);
-            rope2.Rebalance();
+            Console.WriteLine("Adding 'COIS-2020' to rope at index 24");
+            rope.Insert("COIS-2020 ", 24);
+            rope.PrintRope();
+            //Console.WriteLine("Spliting the Rope");
+            //rope.SplitRope(15);
+            Rope<string> rope2 = new Rope<string>(rope.ToString());
+            Console.Write("Index of first occurrence of coding: ");
+            Console.WriteLine(rope2.Find("coding"));
+            Console.WriteLine();
+            Console.WriteLine("Adding 'expriencing difficulties' to rope before 'coding'");
+            rope2.Insert("expriencing difficulties ", 13);
+            rope2.PrintRope();
+            Console.WriteLine();
+            Console.WriteLine("Adding 'Right now,' to rope at index 0");
+            rope2.Insert("Right now,", 0);
+            rope2.PrintRope();
+            Console.WriteLine();
+            Console.WriteLine("Adding 'c#' to rope at the end of the string");
+            rope2.Insert("c#", rope2.Length());
+            rope2.PrintRope();
+            
+            
+            Console.WriteLine();
+            Console.WriteLine("Running rebalance");
+            rope.Rebalance();
             Console.WriteLine("Printing the Rebalanced Rope");
             rope.PrintRope();
             Console.Write("Index of first occurrence of ing: ");
