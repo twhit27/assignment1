@@ -67,6 +67,7 @@ public class Rope<T>
                 current.Right = Build(S, mid, S.Length - mid);
                 current.Length = current.Left.Length + current.Right.Length;
             }
+            Console.WriteLine("The rope was successfully created!");
             //root = Build(S, 0, S.Length);
         }
 
@@ -102,7 +103,7 @@ public class Rope<T>
             }
     
             subString = Substring(i, j, subLength, root, subString);
-    
+            Console.WriteLine("The substring was successfully found!");
             return subString;
         }
     
@@ -210,8 +211,12 @@ public class Rope<T>
                         Find(current.Right, ref s);
                 }
             }
-            if (!found)
+            if (!found){
+                Console.WriteLine("The substring at the given index was not found.");   
                 i = -1;
+            }
+                
+            Console.WriteLine("The substring at the given index was found!");    
             return i;
         }
 
@@ -222,34 +227,38 @@ public class Rope<T>
         {
             Node<T> p = root;
             bool found = false;
-
+    
             int strIndex = i; //Index of the character within the tree
-
+    
             //Checking that the index given is less than the root
             //If the index is not less than the root's length, the character does not exist in the rope
-            if (p.Length - 1 < i)
+            if (p.Length-1 < i)
+            {
+                Console.WriteLine("The index does not exist in the rope.");
                 return ' ';
-
+            }
+                
+    
             //Move through the tree until the leaf node containing the character is found
             while (!found)
             {
+                //Once at the leaf node containing the character, set found to true
+                if (p.Right == null && p.Left == null)
+                    found = true;
+    
                 //If the index is greater than half of the length of the current node, move right
-                if (p.Length / 2 <= strIndex)
+                else if (p.Length/2 <= strIndex) 
                 {
-                    p = p.Right;
+                    p = p.Right;              
                     strIndex -= p.Length; //Adjust the index to account for moving down the rope
                 }
                 //If not, move down the left
                 else
                     p = p.Left;
-
-                //Once at the leaf node containing the character, set found to true
-                if (p.Right == null && p.Left == null)
-                    found = true;
-
+        
             }
-
-            return p.Item[strIndex];     //Return the character at the given index within the string
+            Console.WriteLine("The character was successfully found!");
+            return p.Item[strIndex]; //Return the character at the given index     
         }
 
         //IndexOf Method
@@ -278,6 +287,7 @@ public class Rope<T>
                         IndexOf(current.Right, c);
                 }
             }
+
             return i;
         }
 
@@ -287,6 +297,7 @@ public class Rope<T>
         public void Reverse()
         {
             Reverse(root);
+            Console.WriteLine("The rope was successfully reveresed!"); 
         }
 
         private Node<T> Reverse(Node<T> parent)
