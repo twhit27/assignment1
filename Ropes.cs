@@ -206,40 +206,40 @@ public class Rope<T>
             if (root != null && S != null)
                 Find(root, ref S);
 
-            void Find(Node<T> current, ref string s)
+            void Find(Node<T> current, ref string S)
             {
                 if (!found)
                 {
                     if (current.Left != null)
-                        Find(current.Left, ref s);
-                    if (s.Length > 0)
-                        if (current.Item.Contains(s[0]))
+                        Find(current.Left, ref S);
+                    if (S.Length > 0)
+                        if (current.Item.Contains(S[0]))
                         {
                             if (buffer.Length == 0)
-                                i = current.Item.IndexOf(s[0]) + rIndex;
-                            for (int j = current.Item.IndexOf(s[0]); j < current.Item.Length && sIndex < s.Length; j++)
+                                i = current.Item.IndexOf(S[0]) + rIndex;
+                            for (int j = current.Item.IndexOf(S[0]); j < current.Item.Length && sIndex < S.Length; j++)
                             {
-                                if (current.Item[j] == s[sIndex])
+                                if (current.Item[j] == S[sIndex])
                                 {
-                                    buffer += s[sIndex];
+                                    buffer += S[sIndex];
                                     sIndex++;
                                 }
                                 else
                                 {
+                                    found = false;
                                     buffer = "";
                                     sIndex = 0;
                                     i = -1;
                                 }
                             }
-                            s = s.Substring(sIndex);
+                            S = S.Substring(sIndex);
                             sIndex = 0;
-                            if (s.Length == 0)
+                            if (S.Length == 0)
                                 found = true;
                         }
                     rIndex += current.Item.Length;
-                    i += current.Item.Length;
-                    if (current.Right != null && s.Length > 0)
-                        Find(current.Right, ref s);
+                    if (current.Right != null && S.Length > 0)
+                        Find(current.Right, ref S);
                 }
             }
             if (!found)
@@ -309,7 +309,7 @@ public class Rope<T>
                 {
                     if (current.Left != null)
                         IndexOf(current.Left, c);
-                    if (root.Item.Contains(c))
+                    if (current.Item.Contains(c))
                     {
                         found = true;
                         i = current.Item.IndexOf(c) + index;
@@ -1144,7 +1144,12 @@ public class Rope<T>
             Console.WriteLine(rope.CharAt(3));
             Console.WriteLine("Printing Rope as a String");
             Console.WriteLine(rope.ToString());
-            
+            Console.Write("Index of first occurrence of ing: ");
+            Console.WriteLine(rope.Find("ing"));
+            Console.Write("Index of first occurrence of c: ");
+            Console.WriteLine(rope.Find("c"));
+            Console.Write("Index of first occurrence of z: ");
+            Console.WriteLine(rope.Find("z"));
             Console.WriteLine();
             Console.WriteLine("Adding 'COIS-2020' to rope at index 24");
             rope.Insert("COIS-2020 ", 24);
@@ -1153,21 +1158,19 @@ public class Rope<T>
             //rope.SplitRope(15);
             Rope<string> rope2 = new Rope<string>(rope.ToString());
             Console.Write("Index of first occurrence of coding: ");
-            Console.WriteLine(rope2.Find("coding"));
+            Console.WriteLine(rope.Find("ing"));
             Console.WriteLine();
             Console.WriteLine("Adding 'expriencing difficulties' to rope before 'coding'");
-            rope2.Insert("expriencing difficulties ", 13);
-            rope2.PrintRope();
+            rope.Insert("expriencing difficulties ", 13);
+            rope.PrintRope();
             Console.WriteLine();
             Console.WriteLine("Adding 'Right now,' to rope at index 0");
-            rope2.Insert("Right now,", 0);
-            rope2.PrintRope();
+            rope.Insert("Right now,", 0);
+            rope.PrintRope();
             Console.WriteLine();
             Console.WriteLine("Adding 'c#' to rope at the end of the string");
-            rope2.Insert("c#", rope2.Length());
-            rope2.PrintRope();
-            
-            
+            rope.Insert("c#", rope.Length());
+            rope.PrintRope();
             Console.WriteLine();
             Console.WriteLine("Running rebalance");
             rope.Rebalance();
