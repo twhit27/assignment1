@@ -88,12 +88,6 @@ public class Rope<T>
             else
             {
                 splitTemp = Split(root, i);
-                Console.WriteLine();
-                Console.WriteLine("Printing splitTemp");
-                PrintRope(splitTemp, 0);
-                Console.WriteLine();
-                Console.WriteLine("Printing root");
-                PrintRope(root, 0);
                 if (i < size)
                 {
                     temp = Concatenate(splitTemp, R1.root);
@@ -527,13 +521,6 @@ public class Rope<T>
         //Split the rope with root p at index i and return the root of the right subtree (9 marks).
         private Node<T> Split(Node<T> p, int i)
         {
-            /* Getting a status update on the variables
-            Console.Write("i: ");
-            Console.WriteLine(i);
-            Console.Write("root.Left - i: ");
-            Console.WriteLine(root.Left.Length - i);
-            Console.Write("Root.Left: ");
-            Console.WriteLine(root.Left.Length);*/
             Node<T> rightRoot = new Node<T>("", 0, null, null);
             if (i > p.Length || i == 0)
                 Console.WriteLine("The rope cannot be split at this location");
@@ -544,14 +531,6 @@ public class Rope<T>
                 // Rope will be split on the left side of the current node
                 if (i - p.Right.Length < p.Right.Length)
                 {
-                    /* Getting a status update on the variables
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("i - p.Right: ");
-                    Console.WriteLine(i - p.Right.Length);
-                    Console.Write("p.Right: ");
-                    Console.WriteLine(p.Right.Length);*/
-
                     rightRoot.Left = root.Left;
                     rightRoot.Right = SplitRope(p.Right, i - p.Right.Length, 0, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
@@ -560,13 +539,6 @@ public class Rope<T>
                 // Rope will be split on the right side of the current node
                 else if (i - p.Right.Length > p.Right.Length)
                 {
-                    /* Getting a status update on the variables
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("i - p.Right: ");
-                    Console.WriteLine(i - p.Right.Length);
-                    Console.Write("p.Right: ");
-                    Console.WriteLine(p.Right.Length);*/
                     rightRoot.Left = root.Left;
                     rightRoot.Right = SplitRope(p.Right, i - p.Right.Length, 3, new Node<T>("", 0, null, null));
                     rightRoot.Length = rightRoot.Left.Length;
@@ -585,34 +557,12 @@ public class Rope<T>
             // Trying to split the rope on the left side of the root
             else if (i < p.Left.Length)
             {
-                //Console.WriteLine("i < p.Left.Length");
                 // Rope will be split on the left side of the current node
                 if (p.Left.Length - i < p.Left.Length)
-                {
-                    //Console.WriteLine("p.Left.Length - i < p.Left.Length");
-                    /* Getting a status update on the variables
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("p.Left - i: ");
-                    Console.WriteLine(p.Left.Length - i);
-                    Console.Write("p.Left: ");
-                    Console.WriteLine(p.Left.Length);*/
-
                     rightRoot.Left = SplitRope(p.Left, i, 0, new Node<T>("", 0, null, null));
-                }
                 // rope will be split on the right side of the current node
                 else if (i - p.Left.Length > p.Left.Length)
-                {
-                    //Console.WriteLine("i - p.Left.Length > p.Left.Length");
-                    /* Getting a status update on the variables
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("p.Left - i: ");
-                    Console.WriteLine(p.Left.Length - i);
-                    Console.Write("p.Left: ");
-                    Console.WriteLine(p.Left.Length);*/
                     rightRoot.Left = SplitRope(p.Left, i, 3, new Node<T>("", 0, null, null));
-                }
                 // rope will be split on the current node
                 else if (i - p.Left.Length == 0)
                 {
@@ -623,6 +573,15 @@ public class Rope<T>
                     p.Length = p.Left.Length;
                     p = p.Left;
                 }
+            }
+            // if split occurs at p
+            else if (i == p.Left.Length)
+            {
+                //Console.WriteLine("i - p.Left.Length == 0");
+                rightRoot.Left = p.Left.Left;
+                rightRoot.Right = p.Left.Right;
+                rightRoot.Length = p.Length;
+                p.Left = null;
             }
             ReassignLength(rightRoot);
             compressRope(rightRoot);
@@ -636,14 +595,6 @@ public class Rope<T>
                 // Rope will be split on the left side of the current node
                 if (current.Left != null && current.Length - i > current.Left.Length)
                 {
-                    /* Getting a status update on the variables
-                    Console.WriteLine("i > current.Length: ");
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("current.Length - i: ");
-                    Console.WriteLine(current.Length - i);
-                    Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -662,18 +613,6 @@ public class Rope<T>
                 // rope will be split on the left side of the current node
                 else if (current.Length - i > 0 && current.Right != null)
                 {
-                    /* Getting a status update on the variables
-                    Console.WriteLine("i < current.Length");
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("current.Length - i: ");
-                    Console.WriteLine(current.Length - i);
-                    Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);
-                    Console.WriteLine("i - MAX_LENGTH");
-                    Console.WriteLine(i - MAX_LENGTH);*/
-                    //Console.WriteLine("Current:");
-                    //PrintRope(current, 0);
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -692,14 +631,6 @@ public class Rope<T>
                 // rope will be split on the current node
                 else if (current.Length - i == 0)
                 {
-                    /* Getting a status update on the variables
-                    Console.WriteLine("i == current.Length");
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.Write("i - current.Length: ");
-                    Console.WriteLine(i - current.Length);
-                    Console.Write("Current.Left: ");
-                    Console.WriteLine(current.Length);*/
                     if (directions < 2)
                     {
                         if (directions == 0)
@@ -718,10 +649,6 @@ public class Rope<T>
                 // rope will be split on the current node
                 else
                 {
-                    /*Console.WriteLine("i == current.Length");
-                    Console.Write("i: ");
-                    Console.WriteLine(i);
-                    Console.WriteLine("SplitRope else");*/
                     current.Left = Build(current.Item, 0, i);
                     current.Right = Build(current.Item, i, current.Length - i);
                     current.Length = current.Left.Length;
