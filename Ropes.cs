@@ -101,6 +101,8 @@ public class Rope<T>
                     root = Concatenate(temp, root);
                 }
             }
+            Rebalance();
+            Console.WriteLine("String was successfully inserted!");
         }
 
         //Delete Method
@@ -137,6 +139,8 @@ public class Rope<T>
                 }   
     
             }
+            Rebalance();
+            Console.WriteLine("String was successfully deleted!");
         }
     
         public Node<T> combineSibs(Node<T> parent)
@@ -954,6 +958,7 @@ public class Rope<T>
             //root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
     
             root = branch1;
+            CombineSibs(root);
             return root;
         }
     
@@ -1052,7 +1057,6 @@ public class Rope<T>
     }
 
 
-    }
 
 
     // NOTES 
