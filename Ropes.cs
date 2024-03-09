@@ -130,7 +130,7 @@ public class Rope<T>
                 {
                     R1 = Split(root, i - 1);
                     root = original;
-                    Node<T> R3 = Split(root, j);
+                    Node<T> R3 = Split(root, j - i);
                     root = Concatenate(R1, root);
                     //Rebalance();
                     combineSibs(root);
