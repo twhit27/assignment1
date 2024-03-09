@@ -958,7 +958,7 @@ public class Rope<T>
             //root = Concatenate(branch1, branch2); //Changing the root to the newly modified tree
     
             root = branch1;
-            CombineSibs(root);
+            combineSibs(root);
             return root;
         }
     
