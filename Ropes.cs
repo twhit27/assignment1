@@ -89,7 +89,76 @@ public class Rope<T>
         //Return the substring S[i, j] (6 marks).
         public string Substring(int i, int j)
         {
-            return "string";
+            String subString = ""; //Declaring an empty string to build the substring in
+            int subLength = j - i + 1; //Calculating the resulting length of the substring
+    
+    
+            //Checking if indices are valid
+            //If they are not, print an error message and return an empty string
+            if (i < 0 || i >= root.Length || j < i || j >= root.Length)
+            {
+                Console.WriteLine("Invalid indices, substring could not be found.");
+                return "";
+            }
+    
+            subString = Substring(i, j, subLength, root, subString);
+    
+            return subString;
+        }
+    
+        //Private Substring Method
+        //Used to traverse the rope and concatenate the strings at each node according to the given indices
+        private string Substring(int i, int j, int subLength, Node<T> curr, string subString)
+        {
+    
+            //If a leaf node has not been reached yet, traverse
+            if (curr.Left != null && curr.Right != null)
+            {
+                //If the index is less than or equal to the length of the left side, go left
+                if (i <= curr.Left.Length - 1)
+                {
+                    subString = Substring(i, j, subLength, curr.Left, subString);
+                }
+    
+    
+                //If the index is greater than the length of the left side, go right
+                else
+                {
+                    i -= curr.Left.Length; //Decrementing the index i based on the length of the left branch
+                    subString = Substring(i, j, subLength, curr.Right, subString);
+                }
+            }
+    
+            //Once the string is found, start concatenating and return the substring created so far
+            else
+            {
+                while (i < curr.Length && subString.Length < subLength)
+                {
+                    subString = String.Concat(subString, curr.Item[i]);
+                    i++;
+                }
+    
+                return subString;
+            }
+    
+            //If there are still nodes left to explore, keep going
+            if (subString.Length < subLength && curr.Right != null)
+            {
+                //Evaluating the updated value of i depending on how close it is to the end (j)
+                if (i + subString.Length < j)
+                {
+                    i = j - subLength + 1  + subString.Length;
+                }
+                else
+                {
+                    i = j;
+                }
+                
+                subString = Substring(i, j, subLength, root, subString);
+            }
+    
+            return subString;
+    
         }
 
         //Find Method
