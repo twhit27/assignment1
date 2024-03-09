@@ -109,44 +109,61 @@ public class Rope<T>
             }
         }
 
-   //Delete Method
-    //Delete the substring S[i, j] (5 marks).
-    public void Delete(int i, int j)
-    {
-        if ((i > root.Length || i < 0) || (j > root.Length || j < 0))
-            Console.WriteLine("Invalid indices, please try again with different values.");
-
-        else
+        //Delete Method
+        //Delete the substring S[i, j] (5 marks).
+        public void Delete(int i, int j)
         {
-            Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
-            Node<T> R1 = Split(root, i - 1);
-            root = original;
-            Node<T> R3 = Split(root, j);
-            root = Concatenate(R1, root);
-            Rebalance();
-            combineSibs(root);    
-        }
-    }
-
-    public Node<T> combineSibs(Node<T> parent)
-    {
-        if (parent.Left != null && parent.Right != null)
-        {
-            if (parent.Length <= 5)
-            {
-                Node<T> youngest = new Node<T>((parent.Left.Item + parent.Right.Item), (parent.Left.Length + parent.Right.Length), null, null);
-                parent.Left = youngest;
-                parent.Right = null;
-            }
+            if ((i > root.Length || i < 0) || (j > root.Length || j < 0))
+                Console.WriteLine("Invalid indices, please try again with different values.");
+    
             else
             {
-                parent.Left = combineSibs(parent.Left);
-                parent.Right = combineSibs(parent.Right);
+                Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
+                Node<T> R1;
+                if (i == 0)
+                {
+                    Split(root, j);
+                    //Rebalance();
+                    combineSibs(root);
+                }
+                else if (j == root.Length)
+                {
+                    root = Split(root, i - 1);
+                    //ReBalance();
+                    combineSibs(root);
+                }
+                else
+                {
+                    R1 = Split(root, i - 1);
+                    root = original;
+                    Node<T> R3 = Split(root, j);
+                    root = Concatenate(R1, root);
+                    //Rebalance();
+                    combineSibs(root);
+                }   
+    
             }
         }
-
-        return parent;
-    }
+    
+        public Node<T> combineSibs(Node<T> parent)
+        {
+            if (parent.Left != null && parent.Right != null)
+            {
+                if (parent.Length <= 5)
+                {
+                    Node<T> youngest = new Node<T>((parent.Left.Item + parent.Right.Item), (parent.Left.Length + parent.Right.Length), null, null);
+                    parent.Left = youngest;
+                    parent.Right = null;
+                }
+                else
+                {
+                    parent.Left = combineSibs(parent.Left);
+                    parent.Right = combineSibs(parent.Right);
+                }
+            }
+    
+            return parent;
+        }
 
         //Substring Method
         //Return the substring S[i, j] (6 marks).
