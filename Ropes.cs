@@ -124,10 +124,7 @@ public class Rope<T>
             Node<T> R3 = Split(root, j);
             root = Concatenate(R1, root);
             Rebalance();
-            Console.WriteLine("=======================================");
-            PrintRope();
-            combineSibs(root);
-            
+            combineSibs(root);    
         }
     }
 
