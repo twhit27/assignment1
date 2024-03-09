@@ -881,8 +881,7 @@ public class Rope<T>
 
         //Rebalance Method
         //Rebalance the rope using the algorithm found on pages 1319-1320 of Boehm et al. (9 marks).
-        //Note: Will be switched to private once done testing
-        public Node<T> Rebalance()
+        private Node<T> Rebalance()
         {
             List<int> fibSeq = new List<int> { 1, 2 };
             Node<T>[] minLength;
@@ -1133,7 +1132,6 @@ public class Rope<T>
             rope.PrintRope();
             Console.WriteLine();
             Console.WriteLine("Running rebalance");
-            rope.Rebalance();
             Console.WriteLine("Printing the Rebalanced Rope");
             rope.PrintRope();
             Console.Write("Index of first occurrence of ing: ");
