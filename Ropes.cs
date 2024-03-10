@@ -109,6 +109,16 @@ public class Rope<T>
         //Delete the substring S[i, j] (5 marks).
         public void Delete(int i, int j)
         {
+            if ((i < 0 || i > root.Length) || (j < 0 || j > root.Length))
+            {
+                Console.WriteLine("Index/indices out of valid range");
+                return;
+            }
+            else if (i > j || j < i)
+            {
+                Console.WriteLine("Start index cannot be greater than end index");
+                return;
+            }
             // create a copy of root before split's for reference later
             Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
     
