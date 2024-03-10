@@ -109,38 +109,7 @@ public class Rope<T>
         //Delete the substring S[i, j] (5 marks).
         public void Delete(int i, int j)
         {
-            /*
-            if ((i > root.Length || i < 0) || (j > root.Length || j < 0))
-            {
-                Console.WriteLine("Invalid indices, please try again with different values.");
-                return;
-            }
-
-
-            if (i == 0)
-            {
-                Split(root, j);
-            }
-            if (j == root.Length)
-            {
-                Split(root, i - 1);
-            }
-            else
-            {
-                string left = Substring(0, i - 1);
-                string right = Substring(j, root.Length - 1);
-                root = Build(left + right, 0, left.Length + right.Length);
-            }*/
-
-
-
             Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
-            Console.WriteLine();
-            Console.WriteLine("Printing Root");
-            PrintRope(root, 0);
-            Console.WriteLine();
-            Console.WriteLine("Printing original");
-            PrintRope(original, 0);
             if (i == 0)
             {
                 Split(root, j);
@@ -153,30 +122,17 @@ public class Rope<T>
             {
                 if (i > 20)
                 {
+                    Rope<T> R1 = new Rope<T>(this.ToString());
                     Node<T> segment1 = Split(root, j);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing segment1");
-                    PrintRope(segment1, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing Root");
-                    PrintRope(root, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing original");
-                    PrintRope(original, 0);
-                    /*Node<T> keep = root;
+                    PrintRope(R1.root, 0);
+                    Node<T> keep = new Node<T>(root.Item, root.Length, root.Left, root.Right);
                     root = new Node<T>(original.Item, original.Length, original.Left, original.Right);
                     Console.WriteLine();
                     Console.WriteLine("Second Split");
-                    Node<T> segment2 = Split(original, i);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing segment2");
-                    PrintRope(segment2, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing Root");
-                    PrintRope(root, 0);*/
+                    Node<T> segment2 = Split(R1.root, i);
                     Console.WriteLine();
                     Console.WriteLine("Concatenate");
-                    root = original;
+                    root = Concatenate(segment2, keep);
                 }
                 else if (i <= 20)
                 {
@@ -1181,7 +1137,7 @@ public class Rope<T>
             // Testing Delete //
             //rope.Delete(0,4);
             //rope.Delete(10, 20);
-            rope.Delete(21, 24);
+            rope.Delete(21, 33);
             //rope.Delete(0, 39);
             //rope.Delete(-1, 123);
             //rope.PrintRope();
