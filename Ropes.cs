@@ -109,67 +109,48 @@ public class Rope<T>
         //Delete the substring S[i, j] (5 marks).
         public void Delete(int i, int j)
         {
+            // create a copy of root before split's for reference later
             Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
+    
+            // case where user wants to chop off a front portion of the rope
             if (i == 0)
             {
                 Split(root, j);
             }
+    
+            // case where user wants to chop off a back portion of the rope
             else if (j == root.Length)
             {
                 root = Split(root, i - 1);
             }
+    
+            // case for when the user wants to remove from somehwere in the middle of the rope
             else
             {
-                if (i > 20)
+                // if split occurs on the left side of the tree
+                if (i > root.Left.Length)
                 {
-                    Rope<T> R1 = new Rope<T>(this.ToString());
-                    Node<T> segment1 = Split(root, j);
-                    PrintRope(R1.root, 0);
-                    Node<T> keep = new Node<T>(root.Item, root.Length, root.Left, root.Right);
-                    root = new Node<T>(original.Item, original.Length, original.Left, original.Right);
-                    Console.WriteLine();
-                    Console.WriteLine("Second Split");
-                    Node<T> segment2 = Split(R1.root, i);
-                    Console.WriteLine();
-                    Console.WriteLine("Concatenate");
-                    root = Concatenate(segment2, keep);
+                    Rope<T> R1 = new Rope<T>(this.ToString());  //duplicate the current rope 
+                    Node<T> segment1 = Split(root, j);          // call split a store the result to set up the rope for the following operations
+                    Node<T> keep = new Node<T>(root.Item, root.Length, root.Left, root.Right);      // stores the current split version (second half) before the next split
+                    root = new Node<T>(original.Item, original.Length, original.Left, original.Right);  // restore the root to its state before a split occurred
+                    Node<T> segment2 = Split(R1.root, i); // using the restored root, split root yo obtain the first segement of the result 
+                    root = Concatenate(segment2, keep); // concatenate the first and second halves together to get the result
                 }
-                else if (i <= 20)
+                // if split occurs on the right side  of the tree
+                else if (i <= root.Left.Length)
                 {
+                    // similar approach as left
                     Node<T> segment1 = Split(root, j);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing segment1");
-                    PrintRope(segment1, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing Root");
-                    PrintRope(root, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing original");
-                    PrintRope(original, 0);
                     Node<T> keep = root;
                     root = new Node<T>(original.Item, original.Length, original.Left, original.Right);
-                    Console.WriteLine();
-                    Console.WriteLine("Second Split");
                     Node<T> segment2 = Split(original, i);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing segment2");
-                    PrintRope(segment2, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Printing Root");
-                    PrintRope(root, 0);
-                    Console.WriteLine();
-                    Console.WriteLine("Concatenate");
                     root = Concatenate(segment2, keep);
                 }
             }
-
-            //Rebalance();
-            //combineSibs(root);
-            //Console.WriteLine("String was successfully deleted!");
+    
             Rebalance();
             combineSibs(root);
-            this.PrintRope();
-            Console.WriteLine("==================================");
             Console.WriteLine("String was successfully deleted!");
         }
 
