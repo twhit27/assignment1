@@ -133,27 +133,26 @@ public class Rope<T>
         
 
 
+        //Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
+        //if (i == 0)
+        //{
+        //    Split(root, j);
+        //}
+        //else if (j == root.Length)
+        //{
+        //    root = Split(root, i - 1);
+        //}
         //else
         //{
-        //    Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
-        //    Node<T> R1;
-        //    if (i == 0)
-        //    {
-        //        Split(root, j);
-        //    }
-        //    else if (j == root.Length)
-        //    {
-        //        root = Split(root, i - 1);
-        //    }
-        //    else
-        //    {
-        //        R1 = Split(root, i - 1);
-        //        root = original;
-        //        Node<T> R3 = Split(root, j - i);
-        //        root = Concatenate(R1, root);
-        //    }
-
+        //    Node<T> left = Split(root, i - 1);
+        //    root = new Node<T>(original.Item, original.Length, original.Left, original.Right);
+        //    Split(root, j - i + 1);
+        //    root = Concatenate(left, root);
         //}
+
+        //Rebalance();
+        //combineSibs(root);
+        //Console.WriteLine("String was successfully deleted!");
         Rebalance();
         combineSibs(root);
         this.PrintRope();
