@@ -110,36 +110,54 @@ public class Rope<T>
     public void Delete(int i, int j)
     {
         if ((i > root.Length || i < 0) || (j > root.Length || j < 0))
+        {
             Console.WriteLine("Invalid indices, please try again with different values.");
+            return;
+        }
+            
 
+        if(i == 0)
+        {
+            Split(root, j);
+        }
+        if (j == root.Length)
+        {
+            Split(root, i - 1);
+        }
         else
         {
-            Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
-            Node<T> R1;
-            if (i == 0)
-            {
-                Split(root, j);
-                //Rebalance();
-                combineSibs(root);
-            }
-            else if (j == root.Length)
-            {
-                root = Split(root, i - 1);
-                //ReBalance();
-                combineSibs(root);
-            }
-            else
-            {
-                R1 = Split(root, i - 1);
-                root = original;
-                Node<T> R3 = Split(root, j - i);
-                root = Concatenate(R1, root);
-                //Rebalance();
-                combineSibs(root);
-            }
-
+            string left = Substring(0, i-1);
+            string right = Substring(j, root.Length - 1);
+            root = Build(left + right, 0, left.Length + right.Length);
         }
+        
+
+
+        //else
+        //{
+        //    Node<T> original = new Node<T>(root.Item, root.Length, root.Left, root.Right);
+        //    Node<T> R1;
+        //    if (i == 0)
+        //    {
+        //        Split(root, j);
+        //    }
+        //    else if (j == root.Length)
+        //    {
+        //        root = Split(root, i - 1);
+        //    }
+        //    else
+        //    {
+        //        R1 = Split(root, i - 1);
+        //        root = original;
+        //        Node<T> R3 = Split(root, j - i);
+        //        root = Concatenate(R1, root);
+        //    }
+
+        //}
         Rebalance();
+        combineSibs(root);
+        this.PrintRope();
+        Console.WriteLine("==================================");
         Console.WriteLine("String was successfully deleted!");
     }
 
