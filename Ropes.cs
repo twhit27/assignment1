@@ -154,18 +154,26 @@ public class Rope<T>
             Console.WriteLine("String was successfully deleted!");
         }
 
+        //Optimization: Combine Siblings
+        // When there are 2 nodes whose combined length < 5, this method will combine them into 1
         public Node<T> combineSibs(Node<T> parent)
         {
+            //if both children are not null
             if (parent.Left != null && parent.Right != null)
             {
+                // condition needing combination is found
                 if (parent.Length <= 5)
                 {
+                    // create a new node with the contents of both nodes
                     Node<T> youngest = new Node<T>((parent.Left.Item + parent.Right.Item), (parent.Left.Length + parent.Right.Length), null, null);
+                    // assign this new node to the left child of the parent
                     parent.Left = youngest;
+                    // update right child to be null
                     parent.Right = null;
                 }
                 else
                 {
+                    // continue searching
                     parent.Left = combineSibs(parent.Left);
                     parent.Right = combineSibs(parent.Right);
                 }
@@ -382,7 +390,7 @@ public class Rope<T>
 
 
         //Reverse Method
-        //Reverse the string by swapping children recursivley
+        //Public version: Reverse the string by swapping children recursivley
         public void Reverse()
         {
             Reverse(root);
@@ -398,7 +406,9 @@ public class Rope<T>
             }
 
         }
-
+        
+        //Reverse Method
+        //Private version: Reverse the string by swapping children recursivley
         private Node<T> Reverse(Node<T> parent)
         {
             //If the rope is empty, return immediately
@@ -406,9 +416,10 @@ public class Rope<T>
             {
                 return root;
             }
-
+            // store the current parents state before the following operations
             Node<T> temp = new Node<T>(parent.Item, parent.Length, parent.Left, parent.Right);
 
+            // if the current node is a parent 
             if (parent.Item != "")
             {
                 //reverse string approach from https://www.educative.io/answers/how-to-reverse-a-string-in-c-sharp
@@ -420,6 +431,7 @@ public class Rope<T>
             }
             else
             {
+                // keep searching
                 parent.Left = Reverse(temp.Right);
                 parent.Right = Reverse(temp.Left);
             }
