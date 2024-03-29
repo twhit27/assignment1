@@ -91,34 +91,156 @@ namespace jamieleneveCOIS3020Assignment3
 
         public void Remove()
         {
-            /*
-            if (!Empty())
+            int slot = highestPriority.Degree;
+            BinomialNode<T> p, q;
+
+            q = heap[slot];
+            p = null; //filler value
+
+            //if there are 2 or more trees in the list you will need to navigate to one before highest
+            if (q.RightSibling.RightSibling != null)
             {
-                BinomialHeap<T> H = new BinomialHeap<T>();
-                BinomialNode<T> p, q;
-
-                // Get the reference to the preceding node with the highest priority
-                q = FindHighest();
-
-                // Remove binomial tree p from root list
-                p = q.RightSibling;
-                q.RightSibling = q.RightSibling.RightSibling;
-
-                // Add binomial subtrees of p in reverse order into H
-                p = p.LeftMostChild;
-                while (p != null)
+                while (q != null)
                 {
-                    q = p.RightSibling;
-
-                    // Splice p into H as the first binomial tree
-                    p.RightSibling = H.head.RightSibling;
-                    H.head.RightSibling = p;
-
-                    p = q;
+                    if (q.RightSibling == highestPriority)
+                    {
+                        p = q.RightSibling;
+                        break;
+                    }
+                    else
+                        q = q.RightSibling;
                 }
-                size--;
-                Merge(H);
-            }*/
+            }
+            
+            // if it's a single node you don't need left child, just skip over the node and go straight to coalesce 
+            if (slot == 0)
+            {
+                if (p == null || p.RightSibling == null)
+                    q.RightSibling = null;
+                else
+                    q.RightSibling = p.RightSibling;
+                    
+            }
+            // else the trees have 2 or more items
+            else
+            {
+                p = q.RightSibling;
+                // remove root if at end of list
+                if (p.RightSibling == null)
+                {
+                    q.RightSibling = null;
+                }
+                // remove root otherwise   
+                else
+                {
+                    q.RightSibling = p.RightSibling;
+                }
+                    
+                // move p and q into the fragmented tree
+                q = p.LeftMostChild;
+                p = q.RightSibling;
+
+                //this loop will move the fragments into their proper degree slot
+                while (q != null)
+                {
+                    //add the sub trees to the front of their degree slot
+                    q.RightSibling = heap[q.Degree].RightSibling;
+                    heap[q.Degree].RightSibling = q;
+
+                    //iterate down the fragmented tree
+                    q = p;
+                    if (p != null)
+                        p = p.RightSibling;                   
+                }
+             
+            }
+            //rest highest to be found again in coalesce 
+            highestPriority = null;
+            size--;
+            //clean up!
+            Coalesce();
+        }
+
+        public void Coalesce()
+        {
+            if (Empty())
+            {
+                Console.WriteLine("Empty tree!");
+                return;
+            }
+
+
+            //main outer loop that lets us traverse down the heap array to each Bk type
+            for (int i = 0; i < heap.Length; i++)
+            {
+                BinomialNode<T> prev, curr, next;
+
+                prev = heap[i];
+                //checking for an empty slot
+                if (prev.RightSibling == null)
+                    continue;
+
+                curr = prev.RightSibling;
+
+                //checking for a slot with only 1 item (no need to consolidate, but still need to check if the new highest value is there)
+                if (curr.RightSibling == null)
+                {
+                    if (highestPriority == null || curr.Item.CompareTo(highestPriority.Item) > 0)
+                        highestPriority = curr;
+                    next = null;
+                }                  
+                else
+                    next = curr.RightSibling;
+
+                //consolidate within the slot
+                while (next != null)
+                {
+                    //keep highest priority valid if this has been called from coalesce
+                    if (highestPriority == null || curr.Item.CompareTo(highestPriority.Item) > 0)
+                        highestPriority = curr;
+
+                    // Cases 1 and 2 don't strictly exist anymore, but it's still useful to move the pointers to the end of the slot
+                    if (curr.Degree != next.Degree) 
+                    {
+                        prev = curr;
+                        curr = next;
+                    }
+                    // Case 3: same degree, merge next under current
+                    else if (curr.Item.CompareTo(next.Item) >= 0)
+                    {
+                        curr.RightSibling = next.RightSibling;
+                        BinomialLink(next, curr);
+
+                        //case 3 move curr tree down
+                        prev.RightSibling = curr.RightSibling;
+                        curr.RightSibling = heap[i+1].RightSibling;
+                        heap[i+1].RightSibling = curr;
+
+                        //restore curr in the list
+                        curr = prev.RightSibling;
+                        
+                    }
+                    // Case 4: same degree, merge current under next
+                    else
+                    {
+                        prev.RightSibling = next;
+                        BinomialLink(curr, next);
+                        curr = next;
+
+                        //case 4 move down
+                        prev.RightSibling = next.RightSibling;
+                        curr.RightSibling = heap[i + 1].RightSibling;
+                        heap[i + 1].RightSibling = curr;
+                        curr = prev.RightSibling;
+                        
+                    }
+
+                    if (curr != null)
+                        next = curr.RightSibling;
+                    else
+                        next = null;
+                }
+            }
         }
 
         // Degrees
