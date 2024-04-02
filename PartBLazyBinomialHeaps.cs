@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -95,7 +95,7 @@ namespace jamieleneveCOIS3020Assignment3
             BinomialNode<T> p, q;
 
             q = heap[slot];
-            p = null; 
+            p = null;
 
             //Check 1: if there are 2 or more trees in the list you will need to navigate to one before highest
             if (q.RightSibling.RightSibling != null)
@@ -389,7 +389,7 @@ namespace jamieleneveCOIS3020Assignment3
 
         public override string ToString()
         {
-            return letter.ToString() + " with priority " + priorityValue;
+            return priorityValue.ToString();
         }
     }
 
