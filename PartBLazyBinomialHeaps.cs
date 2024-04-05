@@ -91,6 +91,9 @@ namespace jamieleneveCOIS3020Assignment3
 
         public void Remove()
         {
+            if (Empty())
+                    return;
+                    
             int slot = highestPriority.Degree;
             BinomialNode<T> p, q;
 
@@ -165,10 +168,7 @@ namespace jamieleneveCOIS3020Assignment3
         public void Coalesce()
         {
             if (Empty())
-            {
-                Console.WriteLine("Empty tree!");
                 return;
-            }
 
 
             //main outer loop that lets us traverse down the heap array to each Bk type
@@ -301,6 +301,12 @@ namespace jamieleneveCOIS3020Assignment3
 
         public void print()
         {
+            if (Empty())
+            {
+                Console.WriteLine("Tree empty, print not executed");
+                return;
+            }
+            
             for (int i = 0; i < heap.Length; i++)
             {
                 if (heap[i].RightSibling == null)
