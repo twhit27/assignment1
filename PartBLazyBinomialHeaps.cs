@@ -91,6 +91,7 @@ namespace jamieleneveCOIS3020Assignment3
 
         public void Remove()
         {
+            //if empty to not proceed
             if (Empty())
                     return;
                     
@@ -107,10 +108,12 @@ namespace jamieleneveCOIS3020Assignment3
                 {
                     if (q.RightSibling == highestPriority)
                     {
+                        //keep q at 1 before the highest priority item, and set p to it
                         p = q.RightSibling;
                         break;
                     }
                     else
+                        //keep iterating
                         q = q.RightSibling;
                 }
             }
@@ -125,12 +128,12 @@ namespace jamieleneveCOIS3020Assignment3
 
             }
 
-            //Check 3: (main block) else the trees have 2 or more items
+            //Check 3: (main block) else the trees have 2 or more items and you will need to check children to find the highest
             else
             {
                 p = q.RightSibling;
 
-                // remove root approach if at end of list
+                // remove root approach (skip over it) if at end of list
                 if (p.RightSibling == null)
                 {
                     q.RightSibling = null;
@@ -158,13 +161,16 @@ namespace jamieleneveCOIS3020Assignment3
                 }
 
             }
-            //rest highest to be found again in coalesce 
+            //reset highest to be found again in coalesce 
             highestPriority = null;
             size--;
+            
             //clean up!
             Coalesce();
         }
-
+        
+        // Remove
+        // Merges the FindHighest, Merge, Union, and Consolidate methods
         public void Coalesce()
         {
             if (Empty())
@@ -194,7 +200,7 @@ namespace jamieleneveCOIS3020Assignment3
                 else
                     next = curr.RightSibling;
 
-                // Check 3: (main block) consolidate within the slot
+                // Check 3: (main block) consolidate within the slot since there are at least 2 trees in it
                 while (next != null)
                 {
                     //keep highest priority valid 
