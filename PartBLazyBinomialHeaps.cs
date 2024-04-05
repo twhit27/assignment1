@@ -412,12 +412,18 @@ namespace jamieleneveCOIS3020Assignment3
 
             BinomialHeap<PriorityClass> BH = new BinomialHeap<PriorityClass>();
 
-            for (i = 0; i < 6; i++)
+            char myChar = 'a';
+
+            for (i = 0; i < 15; i++)
             {
-                BH.Add(new PriorityClass(r.Next(50), (char)('a')));
+                BH.Add(new PriorityClass(r.Next(100), (char)(myChar + i)));
             }
+
+            BH.Remove();
+
             Console.WriteLine("Highest Priority Item is : {0}", BH.Front());
             BH.print();
+
             Console.ReadLine();
         }
     }
