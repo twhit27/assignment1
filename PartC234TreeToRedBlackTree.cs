@@ -1,4 +1,4 @@
-using System;
+Fusing System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -515,6 +515,15 @@ namespace jamieleneveCOIS3020Assignment3
         tree.Insert('O');
         
         tree.Print();
+
+        Console.WriteLine("Is 'F' in the tree?");
+        Console.WriteLine(tree.Search('F'));
+
+        Console.WriteLine("Is 'J' in the tree?");
+        Console.WriteLine(tree.Search('J'));
+
+        BSTforRBTree<char> B = tree.Convert();
+        B.Print();
         
         Console.ReadLine();
     }
