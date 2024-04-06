@@ -347,6 +347,256 @@ namespace jamieleneveCOIS3020Assignment3
             }
         }
 
+                //Returns true if key k is successfully deleted; false otherwise. (10 marks)
+        public bool Delete(T k)
+        {
+            return Delete(root, k);
+        }
+        
+        //Private Delete method that is called recursively
+        private bool Delete(Node<T> p, T k)
+        {
+            int keyPos = 0;
+
+            if (p.isLeafNode())
+            {
+                //If a leaf node is reached and the key is in it, delete it and return true
+                if (p.keys.Contains(k))
+                {
+                    p.keys.Remove(k);
+                    Console.WriteLine("Key was successfully deleted.");
+                    return true;
+                }
+                //If a leaf node is reached but the key is not in it, print an error and return false
+                else
+                {
+                    Console.WriteLine("Key could not be found and was not deleted.");
+                    return false;
+                }
+
+            }   
+
+            //If the key is found in an internal node
+            else if (p.keys.Contains(k))
+            {
+                keyPos = p.keys.IndexOf(k);//Getting the position of the key to be deleted in the node
+
+                //Determine which case to follow
+                //1. The child node that precedes k has at least 2 keys
+                if (p.children[keyPos].keys.Count >= 2)
+                {
+                    //Take the last key of the child, add it to the current node, then delete k
+                    p.keys.Insert(0, p.children[keyPos].keys[p.children[keyPos].keys.Count-1]);
+
+                    Delete(p.children[keyPos], p.children[keyPos].keys[p.children[keyPos].keys.Count-1]); //Recursively delete
+
+                    p.keys.Remove(k);
+                    return true;
+                }
+                //2. The child node that succeeds k has at least 2 keys (and check if it exists)
+                else if (keyPos + 1 < p.children.Count && p.children[keyPos+1].keys.Count >= 2)
+                {
+                    //Take the first key of the child, add it to the current node, then delete k
+                    p.keys.Add(p.children[keyPos+1].keys[0]);
+
+                    Delete(p.children[keyPos+1], p.children[keyPos+1].keys[0]); //Recursively delete
+
+                    p.keys.Remove(k);
+                    return true;
+                }
+                //3. Neither children have more than 2 nodes
+                else
+                {
+                    //Merge the two children and move down
+                    p.children[keyPos].keys.Add(k); //Adding the key from the parent to the child
+                    
+                    //If the other child exists, add it as well
+                    if (keyPos + 1 < p.children.Count)
+                    {
+                        p.children[keyPos].keys.Add(p.children[keyPos + 1].keys[0]); //Adding the key from the other child
+
+                        //Moving the children from the other child
+                        for (int j = 0; j < p.children[keyPos+1].children.Count - 1; j--)
+                        {
+                            p.children[keyPos].children.Add(p.children[keyPos + 1].children[j]);
+                        }
+
+                        //Removing the other child from the current node
+                        p.children.Remove(p.children[keyPos + 1]);
+                    }
+
+                    p.keys.Remove(k);
+
+                    //If the root becomes empty in the process set the merged node to be the root
+                    if (p.keys.Count == 0)
+                    {
+                        root = p.children[keyPos];
+                    }
+
+                    Delete(p.children[keyPos], k) ; //Recursively deleting k from the new subtree
+                    
+                    return true;
+                }
+            }
+
+            //If the key is not found and a leaf node has not been reached, attempt to move down
+            else
+            {
+                for (int i = 0; i <= p.keys.Count; i++)
+                {
+                    //Attempt to move down if the current key is less than the next key or if the last key is reached
+                    if (i+1 == p.children.Count || k.CompareTo(p.keys[i]) < 0)
+                    {
+                        //If the child node has at least 2 (t) keys, move down
+                        if (p.children[i].keys.Count >= maxKeysPerNode - 1)
+                        {
+                            return Delete(p.children[i], k);
+                        }
+
+                        //If it doesn't, modify the nodes
+                        else
+                        {
+                            //Attempt to borrow a key from a sibling
+                            //Move through siblings and check if they have more than one key
+                            for (int j = 0; j < p.children.Count; j++)
+                            {
+                                if (i != 0)
+                                {
+                                    keyPos = i - 1;
+                                }
+                                //When looking at the current child node, ignore
+                                //As well, check if the sibling node has more than 1 key
+                                //If it does, 'move' that key to the child node
+                                if (j != i && p.children[j].keys.Count > 1)
+                                {
+                                    //Insert the key of the parent node down to the child we want to move down, and take a key from the sibling and put it in the root
+                                    //If j is less than i, the child is inserted on the left of the key
+                                    if (j < i)
+                                    {
+
+                                        p.children[i].keys.Insert(0, p.keys[keyPos]); //Inserting the key into the current child
+                                        p.keys.Remove(p.keys[keyPos]); //Removing the key from the parent
+
+                                        p.keys.Insert(keyPos, p.children[j].keys[p.children[j].keys.Count - 1]); //Inserting the last key from the sibling into the parent
+                                        p.children[j].keys.Remove(p.children[j].keys[p.children[j].keys.Count - 1]); //Removing the key from the sibling
+
+                                        //Move the first child from the sibling to the current child
+                                        if (p.children[j].children.Count > 0)
+                                        {
+                                            p.children[i].children.Insert(0, p.children[j].children[0]);
+                                            p.children[j].children.Remove(p.children[j].children[0]);
+                                        }
+
+                                        break; //Exit the loop
+                                    }
+
+                                    //If j is greater than i, the child is inserted on the right of the key
+                                    else
+                                    {
+                                        p.children[i].keys.Insert(1, p.keys[keyPos]); //Inserting the key into the current child
+                                        p.keys.Remove(p.keys[keyPos]); //Removing the key from the parent
+
+                                        p.keys.Insert(keyPos, p.children[j].keys[0]); //Inserting the first key of the sibling into the parent
+                                        p.children[j].keys.Remove(p.keys[0]); //Removing the key from the sibling
+
+                                        //Move the first child from the sibling to the current child
+                                        if (p.children[j].children.Count > 0)
+                                        {
+                                            p.children[i].children.Add(p.children[j].children[0]);
+                                            p.children[j].children.Remove(p.children[j].children[0]);
+                                        }
+
+
+                                        break; //Exit the loop
+                                    }
+
+                                }
+                            }
+
+                            //If the node cannot borrow from a sibling, merge with an adjacent node and use a node from the parent
+                            if (p.children[i].keys.Count == 1)
+                            {
+                                for (int j = 0; j < p.children.Count; j++)
+                                {
+                                    //When looking at the current child node, ignore
+                                    //However, merge with an adjacent node once found
+                                    if (j != i)
+                                    {
+                                        //Insert the key of the parent node down to the child we want to move down, and take a key from the sibling and put it in the root
+                                        //If j is less than i, the child is inserted on the left of the key
+                                        if (j < i)
+                                        {
+                                            //Inserting the adjacent node's key
+                                            p.children[i].keys.Insert(0, p.children[j].keys[0]);
+
+                                            //Inserting the children of the adjacent node's children
+                                            for (int m = 0; m < p.children[j].children.Count; m++)
+                                            {
+                                                p.children[i].children.Insert(m, p.children[j].children[m]);
+                                            }
+
+                                            p.children.Remove(p.children[j]); //Removing the adjacent node from the parent
+
+                                            //Inserting a key and a child from the parent into the child node
+                                            p.children[i].keys.Insert(2, p.keys[i]);
+                                            p.children[i].children.Insert(3, p.children[i]);
+
+                                            //Removing the key and child from the parent node
+                                            p.keys.Remove(p.keys[i]);
+                                            p.children.Remove(p.children[i]);
+
+                                            break; //Exit the loop
+                                        }
+
+                                        //If j is greater than i, the child is inserted on the right of the key
+                                        else
+                                        {
+                                            //Inserting the adjacent node's key
+                                            p.children[i].keys.Insert(1, p.children[j].keys[0]);
+
+                                            //Inserting the children of the adjacent node's children
+                                            for (int m = 0; m < p.children[j].children.Count; m++)
+                                            {
+                                                p.children[i].children.Insert(m+2, p.children[j].children[m]);
+                                            }
+
+                                            p.children.Remove(p.children[j]); //Removing the adjacent node from the parent
+
+
+                                            //Inserting a key from the parent into the child node
+                                            p.children[i].keys.Insert(1, p.keys[i]);
+                       
+
+                                            //Removing the key from the parent node
+                                            p.keys.Remove(p.keys[i]);
+                                            
+
+                                            break; //Exit the loop
+                                        }
+
+                                    }
+                                }
+
+                                //If the parent no longer has any keys, make the merged node the root
+                                if (p.keys.Count == 0)
+                                {
+                                    root = p.children[i];
+                                    return Delete(root, k);
+                                }
+                            }
+
+                            return Delete(p.children[i], k);
+                        }
+
+                    }
+
+                }
+   
+             }
+
+            return true; //If the key is not found, return false
+        }
+
         /*
          * Search()
          * paramter: the key to search for of type T
@@ -456,11 +706,10 @@ namespace jamieleneveCOIS3020Assignment3
 
             if (node != null)
             {
-
                 //Printing off the nodes on the right
-                for (int i = 1; i <= node.children.Count-1; i++)
+                for (int j = node.children.Count-1; j <= node.children.Count-1 && j > 0; j++)
                 {
-                    Print(node.children[i], k + 3);
+                    Print(node.children[j], k + 3);
                 }
 
                 Console.WriteLine();
@@ -474,11 +723,13 @@ namespace jamieleneveCOIS3020Assignment3
                 Console.WriteLine();
 
                 //Printing off the nodes on the left
-                for (int i = node.children.Count-2; i >= 0; i--)
-                {
-                    Print(node.children[i], k + 3);
+                for (int j = node.children.Count - 2; j >= 0; j--)
+                {    
+                    Print(node.children[j], k + 3);
                 }
+
             }
+        }
         }
     }
     //--------------------------------------------------------------------------------------
@@ -513,6 +764,18 @@ namespace jamieleneveCOIS3020Assignment3
         tree.Insert('H');
         tree.Insert('L');
         tree.Insert('O');
+       // tree.Delete('E');
+       // tree.Delete('A');
+       // tree.Delete('F');
+       // tree.Delete('D');
+       // tree.Delete('H');
+       // tree.Delete('C');
+       // tree.Delete('Z');
+       // tree.Delete('X');
+       // tree.Delete('L');
+        //tree.Delete('O');
+        //tree.Delete('Y');
+        //tree.Delete('G');
         
         tree.Print();
 
