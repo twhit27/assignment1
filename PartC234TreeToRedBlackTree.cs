@@ -730,6 +730,56 @@ namespace jamieleneveCOIS3020Assignment3
 
             }
         }
+
+        // Adapted print helper method to handle 3-nodes 
+        private void Print2(Node<T> node, int k)
+        {
+            string t = new string(' ', k);
+            string s = t;
+            if (node != null)
+            {
+                //Printing off the nodes on the right
+                for (int j = node.children.Count - 1; j <= node.children.Count - 1 && j > 0; j++)
+                {
+                    Print(node.children[j], k + 5);
+                }
+
+                Console.WriteLine();
+
+                //Printing out the keys in the node
+                for (int m = node.keys.Count - 1; m >= 0; m--)
+                {
+                    s += node.keys[m];
+                }
+                if (node.children.Count == 3){
+                    s += new string(' ', 3);
+                    for (int m = node.children[1].keys.Count - 1; m >= 0; m--)
+                    {
+                        s += node.children[1].keys[m];
+                    }
+                    Console.WriteLine(s);
+                    Console.WriteLine();
+
+                    //Printing off the nodes on the left
+                    for (int j = node.children.Count - 3; j >= 0; j--)
+                    {
+                        Print(node.children[j], k + 5);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(s);
+                    Console.WriteLine();
+
+                    //Printing off the nodes on the left
+                    for (int j = node.children.Count - 2; j >= 0; j--)
+                    {
+                        Print(node.children[j], k + 5);
+                    }
+                }
+
+            }
+        }
         }
     }
     //--------------------------------------------------------------------------------------
