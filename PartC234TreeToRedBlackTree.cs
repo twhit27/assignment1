@@ -350,6 +350,12 @@ namespace jamieleneveCOIS3020Assignment3
                 //Returns true if key k is successfully deleted; false otherwise. (10 marks)
         public bool Delete(T k)
         {
+            //Check if the tree is empty
+            if (root.keys.Count == 0)
+            {
+                Console.WriteLine("Tree is empty, delete was unsuccessful.");
+                return false;
+            }
             return Delete(root, k);
         }
         
